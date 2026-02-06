@@ -6,14 +6,6 @@ const { generateAccessToken } = require('../utils/jwt');
 const register = asyncHandler(async (req, res, next) => {
     const { username, email, password } = req.body;
 
-    if (!username || !email || !password) {
-        return res.status(400).json({ status: 'fail', message: 'All fields are required', data: null });
-    }
-
-    if (password.length < 6) {
-        return res.status(400).json({ status: 'fail', message: 'Password must be at least 6 characters' })
-    }
-
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
 
     if (existingUser) {

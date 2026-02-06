@@ -1,31 +1,42 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { User } = require('../models/user.model');
 const { Chat } = require('../models/chat.model');
+const appError = require('../utils/appError');
+const httpStatusText = require('../utils/httpStatusText');
 
 const getOrCreateChat = asyncHandler(async (req, res, next) => {
     const { userId } = req.body;
-    if (!userId) {
-        return res.status(400).json({ status: 'fail', message: 'UserId is required' });
-    }
-
-    if (userId === req.userId) {
-        return res.status(400).json({ status: 'fail', message: 'Can not create chat with yourself' });
-    }
-
-    // check if the user exists that i make chat with it
     const chatWithUser = await User.findById(userId);
 
     if (!chatWithUser) {
-        return res.status(400).json({ status: 'fail', message: 'Select a user to chat with it' })
+        return next(appError.create('Chat participant not found', 400, httpStatusText.ERROR));
     }
 
     const chat = await Chat.getOrCreateChat(req.userId, userId);
-
-    return res.status(200).json({ status: 'success', data: { chat } });
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chat } });
 });
 
 const getAllChats = asyncHandler(async (req, res, next) => {
+    const chats = await Chat.find({
+        participants: req.userId
+    })
+        .populate('participants', 'username email avatar online lastSeen')
+        .populate({
+            path: 'lastMessage',
+            populate: {
+                path: 'sender',
+                select: 'username avatar'
+            }
+        })
+        .sort({ updatedAt: -1 });
 
+    const chatsWithUnread = chats.map(chat => {
+        const chatObj = chat.toObject();
+        chatObj.unreadCount = chat.unreadCount.get(req.userId.toString()) || 0;
+        return chatObj;
+    });
+
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chat: chatsWithUnread } });
 });
 
 module.exports = { getOrCreateChat, getAllChats };
