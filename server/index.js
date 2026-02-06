@@ -8,6 +8,7 @@ const http = require('http');
 const cors = require('cors');
 const { authRouter } = require('../server/routes/auth.routes');
 const { chatRouter } = require('../server/routes/chat.routes');
+const { usersRouter } = require('../server/routes/user.routes');
 const { globalErrorHandler } = require('./middlewares/globalErrorHandler');
 
 mongoose.connect(process.env.MONGO_URI)
@@ -28,6 +29,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/chats', chatRouter);
+app.use('/api/v1/users', usersRouter);
 app.use(globalErrorHandler);
 
 server.listen(PORT, () => {

@@ -1,6 +1,9 @@
 export interface User {
-  id: string;
-  email: string;
-  username: string;
-  avatar: string;
+    _id: string,
+    email: string;
+    username: string;
+    avatar: string;
+    bio: string;
+    online: boolean;
+    lastSeen: string;
 }

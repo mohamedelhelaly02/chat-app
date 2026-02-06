@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { User } from '../../shared/models/user.model';
+import { AuthUser } from '../../shared/models/auth-user.model';
 import { Router } from '@angular/router';
 
 interface RegisterData {
@@ -11,7 +11,7 @@ interface RegisterData {
 }
 
 interface UserData {
-  user: User;
+  user: AuthUser;
 }
 
 interface AuthResponse {
@@ -25,6 +25,8 @@ interface LoginCredentials {
   password: string;
 }
 
+interface LogoutResponse { status: string, message: string };
+
 @Injectable({
   providedIn: 'root',
 })
@@ -33,7 +35,7 @@ export class AuthService {
   readonly httpClient = inject(HttpClient);
   readonly router = inject(Router);
 
-  currentUser: WritableSignal<User | null> = signal<User | null>(null);
+  currentUser: WritableSignal<AuthUser | null> = signal<AuthUser | null>(null);
   token: WritableSignal<string | null> = signal<string | null>(null);
 
   constructor() {
@@ -64,6 +66,19 @@ export class AuthService {
         headers: new HttpHeaders().set('Content-Type', 'application/json'),
       })
       .pipe(tap((response) => this.handleAuthSuccess(response)));
+  }
+
+  logout(): Observable<LogoutResponse> {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+
+    this.currentUser.set(null);
+    this.token.set(null);
+
+    return this.httpClient.post<LogoutResponse>(`${this.BASE_URL}/logout`, null)
+      .pipe(
+        tap(() => this.router.navigate(['/auth/login']))
+      );
   }
 
   private handleAuthSuccess(response: AuthResponse) {

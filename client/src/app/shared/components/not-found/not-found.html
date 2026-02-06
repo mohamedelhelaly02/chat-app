@@ -1,1 +1,102 @@
-<p>not-found works!</p>
+<div class="not-found-screen">
+  <div class="not-found-container">
+    <!-- Animated 404 -->
+    <div class="error-animation">
+      <div class="error-number">
+        <span class="digit">4</span>
+        <span class="digit emoji">😢</span>
+        <span class="digit">4</span>
+      </div>
+      <div class="error-shadow"></div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-content">
+      <h1 class="error-title">عذراً! الصفحة غير موجودة</h1>
+      <p class="error-description">
+        يبدو أن الصفحة التي تبحث عنها قد انتقلت إلى مكان آخر أو لم تعد موجودة. 
+        لا تقلق، يمكنك العودة إلى الصفحة الرئيسية أو استكشاف الروابط أدناه.
+      </p>
+
+      <!-- Auto Redirect Counter -->
+      <div class="redirect-info">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>سيتم توجيهك تلقائياً بعد <strong>{{ countdown() }}</strong> ثوانٍ</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="error-actions">
+        <button class="action-btn primary" (click)="redirectToHome()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>العودة للرئيسية</span>
+        </button>
+
+        <button class="action-btn secondary" (click)="goBack()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>الرجوع للخلف</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Helpful Links -->
+    <div class="helpful-links">
+      <h3>روابط مفيدة قد تساعدك:</h3>
+      <div class="links-grid">
+        @for (link of suggestions(); track link.route) {
+          <a [routerLink]="link.route" class="link-card">
+            @if (link.icon === 'home') {
+              <div class="link-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+              </div>
+            } @else if (link.icon === 'chat') {
+              <div class="link-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+            } @else if (link.icon === 'profile') {
+              <div class="link-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+            } @else if (link.icon === 'help') {
+              <div class="link-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+            }
+            <span>{{ link.label }}</span>
+            <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="floating-shapes">
+      <div class="shape shape-1">😊</div>
+      <div class="shape shape-2">💬</div>
+      <div class="shape shape-3">❤️</div>
+      <div class="shape shape-4">⭐</div>
+    </div>
+  </div>
+</div>

@@ -34,7 +34,7 @@ const register = asyncHandler(async (req, res, next) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                avatar: user.avatar,
+                avatar: user.avatar
             }
         }
     });
