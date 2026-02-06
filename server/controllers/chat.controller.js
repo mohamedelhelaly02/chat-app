@@ -9,7 +9,7 @@ const getOrCreateChat = asyncHandler(async (req, res, next) => {
     const chatWithUser = await User.findById(userId);
 
     if (!chatWithUser) {
-        return next(appError.create('Chat participant not found', 400, httpStatusText.ERROR));
+        return next(appError.create('Chat participant not found', 400, httpStatusText.FAIL));
     }
 
     const chat = await Chat.getOrCreateChat(req.userId, userId);

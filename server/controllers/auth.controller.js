@@ -2,6 +2,8 @@ const asyncHandler = require("../utils/asyncHandler");
 const { User } = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const { generateAccessToken } = require('../utils/jwt');
+const httpStatusText = require('../utils/httpStatusText');
+const appError = require('../utils/appError');
 
 const register = asyncHandler(async (req, res, next) => {
     const { username, email, password } = req.body;
@@ -9,7 +11,7 @@ const register = asyncHandler(async (req, res, next) => {
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
 
     if (existingUser) {
-        return res.status(400).json({ status: 'fail', message: 'User already existed' });
+        return next(appError.create('User already existed', 400, httpStatusText.FAIL));
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,7 +28,6 @@ const register = asyncHandler(async (req, res, next) => {
 
     return res.status(201).json({
         status: 'success',
-        message: 'Register success',
         token: accessToken,
         data: {
             user: {
@@ -44,12 +45,12 @@ const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-        return res.status(400).json({ status: 'fail', message: 'Invalid email or password' });
+        return next(appError.create('Invalid email or password', 400, httpStatusText.FAIL));
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-        return res.status(400).json({ status: 'fail', message: 'Invalid email or password' });
+        return next(appError.create('Invalid email or password', 400, httpStatusText.FAIL));
     }
 
     user.online = true;
@@ -61,7 +62,6 @@ const login = asyncHandler(async (req, res, next) => {
 
     return res.status(200).json({
         status: 'success',
-        message: 'Login success',
         token: accessToken,
         data: {
             user: {
