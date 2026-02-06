@@ -36,7 +36,7 @@ const getAllChats = asyncHandler(async (req, res, next) => {
         return chatObj;
     });
 
-    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chat: chatsWithUnread } });
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chats: chatsWithUnread } });
 });
 
 module.exports = { getOrCreateChat, getAllChats };

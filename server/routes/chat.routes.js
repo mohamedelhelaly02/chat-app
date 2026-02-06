@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getOrCreateChat, getAllChats } = require('../controllers/chat.controller');
+const { getAllMessages } = require('../controllers/messages.controller');
 const authMiddleware = require('../middlewares/authMiddleware');
 const { getOrCreateChatValidator } = require('../validators/chatValidationSchema');
 const { validateMiddleware } = require('../middlewares/validateMiddleware');
@@ -16,5 +17,10 @@ router.route('')
         authMiddleware,
         getAllChats
     );
+
+router.get('/:chatId/messages',
+    authMiddleware,
+    getAllMessages
+);
 
 module.exports = { chatRouter: router };

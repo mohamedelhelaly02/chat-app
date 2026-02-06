@@ -7,11 +7,11 @@ const validateMiddleware = (req, res, next) => {
 
     if (!validationErrors.isEmpty()) {
         return res.status(422).json({
-            status: httpStatusText.FAIL,
+            status: httpStatusText.ERROR,
             data: {
                 errors: validationErrors.array().map(err => ({
                     field: err.path,
-                    message: err.msg
+                    message: err.msg,
                 }))
             }
         });
