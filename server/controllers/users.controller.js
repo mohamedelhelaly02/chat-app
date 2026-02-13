@@ -10,4 +10,17 @@ const getAllUsers = asyncHandler(async (req, res) => {
     return res.status(200).json({ status: httpStatusText.SUCCESS, data: { users } });
 });
 
-module.exports = { getAllUsers };
+
+const getCurrentUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.userId)
+        .select('-password -__v');
+
+    if (!user) {
+        return res.status(404).json({ status: httpStatusText.FAIL, message: 'User not found' });
+    }
+
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { user } });
+});
+
+
+module.exports = { getAllUsers, getCurrentUserProfile };

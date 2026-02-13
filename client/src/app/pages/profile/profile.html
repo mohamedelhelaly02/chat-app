@@ -1,0 +1,118 @@
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="avatar-section">
+        <img [src]="profileData.avatar" alt="Profile Avatar" class="profile-avatar">
+        @if (isEditing()) {
+        <div class="avatar-upload">
+          <input type="file" #avatarInput hidden accept="image/*" (change)="changeAvatar($event)">
+          <button class="upload-btn" (click)="avatarInput.click()" title="تغيير الصورة">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+              </path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </button>
+        </div>
+        }
+      </div>
+
+      <div class="header-info">
+        @if (isEditing()) {
+        <h2 class="edit-label">تحرير الملف الشخصي</h2>
+        } @else {
+        <h1 class="profile-title">{{ profileData.name }}</h1>
+        <p class="profile-subtitle">{{ profileData.email }}</p>
+        }
+      </div>
+
+      <div class="header-actions">
+        @if (!isEditing()) {
+        <button class="edit-btn" (click)="startEditing()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          تعديل الملف الشخصي
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Profile Form -->
+    <form [formGroup]="profileForm" class="profile-form">
+      <!-- Name Field -->
+      <div class="form-group">
+        <label for="name" class="form-label">الاسم الكامل</label>
+        @if (isEditing()) {
+        <input id="name" type="text" formControlName="name" class="form-control"
+          [class.error]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
+        @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+        <span class="error-message">{{ nameError }}</span>
+        }
+        } @else {
+        <p class="field-value">{{ profileData.name }}</p>
+        }
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">البريد الإلكتروني</label>
+        @if (isEditing()) {
+        <input id="email" type="email" formControlName="email" class="form-control"
+          [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+        @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+        <span class="error-message">{{ emailError }}</span>
+        }
+        } @else {
+        <p class="field-value">{{ profileData.email }}</p>
+        }
+      </div>
+
+      <!-- Phone Field -->
+      <div class="form-group">
+        <label for="phone" class="form-label">رقم الهاتف</label>
+        @if (isEditing()) {
+        <input id="phone" type="tel" formControlName="phone" class="form-control"
+          [class.error]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
+        @if (profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched) {
+        <span class="error-message">{{ phoneError }}</span>
+        }
+        } @else {
+        <p class="field-value">{{ profileData.phone }}</p>
+        }
+      </div>
+
+      <!-- Bio Field -->
+      <div class="form-group">
+        <label for="bio" class="form-label">النبذة الشخصية</label>
+        @if (isEditing()) {
+        <textarea id="bio" formControlName="bio" class="form-control" rows="4"
+          placeholder="أخبر الآخرين عن نفسك"></textarea>
+        <span class="char-count">{{ profileForm.get('bio')?.value?.length || 0 }}/150</span>
+        } @else {
+        <p class="field-value">{{ profileData.bio }}</p>
+        }
+      </div>
+
+      <!-- Join Date -->
+      <div class="form-group">
+        <label class="form-label">تاريخ الانضمام</label>
+        <p class="field-value">{{ profileData.joinDate | date:'dd/MM/yyyy' }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      @if (isEditing()) {
+      <div class="form-actions">
+        <button type="button" class="btn btn-save" (click)="saveProfile()" [disabled]="profileForm.invalid">
+          حفظ التغييرات
+        </button>
+        <button type="button" class="btn btn-cancel" (click)="cancelEditing()">
+          إلغاء
+        </button>
+      </div>
+      }
+    </form>
+  </div>
+
+</div>

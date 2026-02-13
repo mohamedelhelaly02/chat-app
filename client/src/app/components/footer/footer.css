@@ -67,7 +67,7 @@
     gap: 8px;
     padding: 12px 20px;
   }
-  
+
   .footer-left,
   .footer-center,
   .footer-right {
@@ -75,7 +75,7 @@
     text-align: center;
     justify-content: center;
   }
-  
+
   .app-footer {
     height: auto;
   }
