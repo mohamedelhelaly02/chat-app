@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserProfileResponse, UserService } from '../../services/user-service';
+import { ChangeAvatarResponse, UserProfileResponse, UserService } from '../../services/user-service';
 import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth-service';
 
@@ -49,12 +49,13 @@ export class Profile implements OnInit {
         this.isLoading.set(true);
         this.userService.getCurrentUserProfile().subscribe({
             next: (response: UserProfileResponse) => {
+                console.log(response);
                 this.profileData.set(response.data.user);
-                // this.profileForm.patchValue({
-                //     username: response.user.username,
-                //     email: response.user.email,
-                //     bio: response.user.bio,
-                // });
+                this.profileForm.patchValue({
+                    username: response.data.user.username,
+                    email: response.data.user.email,
+                    bio: response.data.user.bio,
+                });
                 this.isLoading.set(false);
             },
             error: () => {
@@ -98,22 +99,26 @@ export class Profile implements OnInit {
     }
 
     changeAvatar(event: any) {
-        // const file = event.target.files[0];
-        // if (file) {
-        //     const formData = new FormData();
-        //     formData.append('avatar', file);
+        const selectedFile = event.target.files[0];
+        console.log(selectedFile);
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('avatar', selectedFile);
+            this.isLoading.set(true);
+            this.userService.changeUserAvatar(formData).subscribe({
+                next: (response: ChangeAvatarResponse) => {
+                    this.isLoading.set(false);
 
-        //     this.isLoading.set(true);
-        //     this.userService.uploadAvatar(formData).subscribe({
-        //         next: (user: User) => {
-        //             this.profileData.set(user);
-        //             this.isLoading.set(false);
-        //         },
-        //         error: () => {
-        //             this.isLoading.set(false);
-        //         },
-        //     });
-        // }
+                    this.profileData.update(prev => ({
+                        ...prev,
+                        avatar: response.data.avatar
+                    }));
+                },
+                error: () => {
+                    this.isLoading.set(false);
+                }
+            });
+        }
     }
 
     togglePasswordVisibility() {

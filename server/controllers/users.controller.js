@@ -49,7 +49,7 @@ const changeUserAvatar = asyncHandler(async (req, res) => {
 
     const avatarPath = `uploads/avatars/${user._id}_${Date.now()}_${avatarFile.name}`;
     await avatarFile.mv(avatarPath);
-    user.avatar = `/${avatarPath}`;
+    user.avatar = `${process.env.BASE_URL}/${avatarPath}`;
     await user.save();
 
     return res.status(200).json({ status: httpStatusText.SUCCESS, data: { avatar: user.avatar } });

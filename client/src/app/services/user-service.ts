@@ -20,11 +20,18 @@ export type UserProfileResponse = {
   }
 }
 
+export type ChangeAvatarResponse = {
+  status: string;
+  data: {
+    avatar: string;
+  }
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  readonly BASE_URL: string = 'http://localhost:4000/api/v1/users';
+  BASE_URL: string = 'http://localhost:4000/api/v1/users';
   private readonly httpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
 
@@ -43,6 +50,10 @@ export class UserService {
           }
         })
       )
+  }
+
+  changeUserAvatar(formData: FormData): Observable<ChangeAvatarResponse> {
+    return this.httpClient.post<ChangeAvatarResponse>(`${this.BASE_URL}/me/avatar`, formData);
   }
 }
 
