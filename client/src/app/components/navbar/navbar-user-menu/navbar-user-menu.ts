@@ -1,7 +1,8 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { User } from '../../../models/user.model';
+import { AuthService } from '../../../services/auth-service';
 
 @Component({
   selector: 'app-navbar-user-menu',
@@ -11,6 +12,7 @@ import { User } from '../../../models/user.model';
   styleUrl: '../navbar.css',
 })
 export class NavbarUserMenu {
+  authService = inject(AuthService);
   user = input.required<User | null>();
   showDropdown = signal(false);
 
@@ -20,5 +22,16 @@ export class NavbarUserMenu {
 
   closeDropdown() {
     this.showDropdown.set(false);
+  }
+
+  logout() {
+    this.authService.logout().subscribe(() => {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      this.authService.currentUser.set(null);
+      this.authService.token.set(null);
+
+    })
   }
 }

@@ -53,7 +53,32 @@ export class UserService {
   }
 
   changeUserAvatar(formData: FormData): Observable<ChangeAvatarResponse> {
-    return this.httpClient.post<ChangeAvatarResponse>(`${this.BASE_URL}/me/avatar`, formData);
+    return this.httpClient.post<ChangeAvatarResponse>(`${this.BASE_URL}/me/avatar`, formData)
+      .pipe(
+        tap(response => {
+          if (response.status === 'success') {
+            const updatedUser = {
+              ...this.authService.currentUser(),
+              avatar: response.data.avatar
+            };
+            this.authService.currentUser.set(updatedUser as User);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        })
+      );
+  }
+
+  updateUserProfile(userData: Partial<User>): Observable<UserProfileResponse> {
+    return this.httpClient.put<UserProfileResponse>(`${this.BASE_URL}/me/profile`, userData)
+      .pipe(
+        tap(response => {
+          if (response.status === 'success') {
+            const updatedUser = { ...this.authService.currentUser(), ...userData };
+            this.authService.currentUser.set(updatedUser as User);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        })
+      );
   }
 }
 
