@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { computed, inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthUser } from '../models/auth-user.model';
+import { User } from '../models/user.model';
 
 interface RegisterData {
   username: string;
@@ -11,7 +11,7 @@ interface RegisterData {
 }
 
 interface UserData {
-  user: AuthUser;
+  user: User;
 }
 
 interface AuthResponse {
@@ -38,7 +38,7 @@ export class AuthService {
   readonly httpClient = inject(HttpClient);
   readonly router = inject(Router);
 
-  currentUser: WritableSignal<AuthUser | null> = signal<AuthUser | null>(null);
+  currentUser: WritableSignal<User | null> = signal<User | null>(null);
   token: WritableSignal<string | null> = signal<string | null>(null);
 
   isAuthenticated = computed(() => !!this.currentUser() && !!this.token());

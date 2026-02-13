@@ -6,4 +6,6 @@ export interface User {
     bio: string;
     online: boolean;
     lastSeen: string;
+    createdAt: string;
+    updatedAt: string;
 }

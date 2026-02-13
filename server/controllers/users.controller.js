@@ -22,5 +22,37 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
     return res.status(200).json({ status: httpStatusText.SUCCESS, data: { user } });
 });
 
+const updateCurrentUserProfile = asyncHandler(async (req, res) => {
+    const { username, email, bio } = req.body;
 
-module.exports = { getAllUsers, getCurrentUserProfile };
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+        return res.status(404).json({ status: httpStatusText.FAIL, message: 'User not found' });
+    }
+
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.bio = bio || user.bio;
+
+    await user.save();
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { user } });
+});
+
+const changeUserAvatar = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.userId);
+    if (!user) {
+        return res.status(404).json({ status: httpStatusText.FAIL, message: 'User not found' });
+    }
+
+    const avatarFile = req.files.avatar;
+
+    const avatarPath = `uploads/avatars/${user._id}_${Date.now()}_${avatarFile.name}`;
+    await avatarFile.mv(avatarPath);
+    user.avatar = `/${avatarPath}`;
+    await user.save();
+
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { avatar: user.avatar } });
+});
+
+module.exports = { getAllUsers, getCurrentUserProfile, updateCurrentUserProfile, changeUserAvatar };

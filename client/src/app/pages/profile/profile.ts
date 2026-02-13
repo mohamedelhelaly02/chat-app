@@ -1,6 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UserProfileResponse, UserService } from '../../services/user-service';
+import { User } from '../../models/user.model';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
     selector: 'app-profile',
@@ -9,26 +12,54 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
     templateUrl: './profile.html',
     styleUrl: './profile.css',
 })
-export class Profile {
+export class Profile implements OnInit {
+    private userService = inject(UserService);
+    private fb = inject(FormBuilder);
+
     isEditing = signal(false);
+    isLoading = signal(false);
     profileForm: FormGroup;
     showPassword = signal(false);
 
-    profileData = {
-        name: 'أحمد محمد',
-        email: 'ahmed@example.com',
-        phone: '+966501234567',
-        bio: 'مرحباً، أنا أستخدم تطبيق ChatLink للتواصل',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        joinDate: '2024-01-15',
-    };
+    profileData = signal<User>({
+        _id: '',
+        username: '',
+        email: '',
+        avatar: '',
+        bio: '',
+        online: false,
+        lastSeen: '',
+        createdAt: '',
+        updatedAt: '',
+    });
 
-    constructor(private fb: FormBuilder) {
+    constructor() {
         this.profileForm = this.fb.group({
-            name: [this.profileData.name, [Validators.required, Validators.minLength(3)]],
-            email: [this.profileData.email, [Validators.required, Validators.email]],
-            phone: [this.profileData.phone, [Validators.required]],
-            bio: [this.profileData.bio, [Validators.maxLength(150)]],
+            username: ['', [Validators.required, Validators.minLength(3)]],
+            email: ['', [Validators.required, Validators.email]],
+            bio: ['', [Validators.maxLength(150)]],
+        });
+    }
+
+    ngOnInit() {
+        this.loadUserProfile();
+    }
+
+    loadUserProfile() {
+        this.isLoading.set(true);
+        this.userService.getCurrentUserProfile().subscribe({
+            next: (response: UserProfileResponse) => {
+                this.profileData.set(response.data.user);
+                // this.profileForm.patchValue({
+                //     username: response.user.username,
+                //     email: response.user.email,
+                //     bio: response.user.bio,
+                // });
+                this.isLoading.set(false);
+            },
+            error: () => {
+                this.isLoading.set(false);
+            },
         });
     }
 
@@ -39,45 +70,63 @@ export class Profile {
     cancelEditing() {
         this.isEditing.set(false);
         this.profileForm.reset({
-            name: this.profileData.name,
-            email: this.profileData.email,
-            phone: this.profileData.phone,
-            bio: this.profileData.bio,
+            username: this.profileData().username,
+            email: this.profileData().email,
+            bio: this.profileData().bio,
         });
     }
 
     saveProfile() {
         if (this.profileForm.valid) {
-            this.profileData.name = this.profileForm.value.name;
-            this.profileData.email = this.profileForm.value.email;
-            this.profileData.phone = this.profileForm.value.phone;
-            this.profileData.bio = this.profileForm.value.bio;
-            this.isEditing.set(false);
+            this.isLoading.set(true);
+            const updatedData = {
+                ...this.profileData(),
+                ...this.profileForm.value,
+            };
+
+            // this.userService.updateProfile(updatedData).subscribe({
+            //     next: (user: User) => {
+            //         this.profileData.set(user);
+            //         this.isEditing.set(false);
+            //         this.isLoading.set(false);
+            //     },
+            //     error: () => {
+            //         this.isLoading.set(false);
+            //     },
+            // });
         }
     }
 
     changeAvatar(event: any) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-                this.profileData.avatar = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
+        // const file = event.target.files[0];
+        // if (file) {
+        //     const formData = new FormData();
+        //     formData.append('avatar', file);
+
+        //     this.isLoading.set(true);
+        //     this.userService.uploadAvatar(formData).subscribe({
+        //         next: (user: User) => {
+        //             this.profileData.set(user);
+        //             this.isLoading.set(false);
+        //         },
+        //         error: () => {
+        //             this.isLoading.set(false);
+        //         },
+        //     });
+        // }
     }
 
     togglePasswordVisibility() {
-        this.showPassword.update(value => !value);
+        this.showPassword.set(!this.showPassword());
     }
 
-    get nameError(): string {
-        const control = this.profileForm.get('name');
+    get usernameError(): string {
+        const control = this.profileForm.get('username');
         if (control?.hasError('required')) {
-            return 'الاسم مطلوب';
+            return 'اسم المستخدم مطلوب';
         }
         if (control?.hasError('minlength')) {
-            return 'الاسم يجب أن يكون 3 أحرف على الأقل';
+            return 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل';
         }
         return '';
     }
@@ -89,14 +138,6 @@ export class Profile {
         }
         if (control?.hasError('email')) {
             return 'البريد الإلكتروني غير صحيح';
-        }
-        return '';
-    }
-
-    get phoneError(): string {
-        const control = this.profileForm.get('phone');
-        if (control?.hasError('required')) {
-            return 'رقم الهاتف مطلوب';
         }
         return '';
     }

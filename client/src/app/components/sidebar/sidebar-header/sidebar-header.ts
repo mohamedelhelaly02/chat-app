@@ -1,7 +1,7 @@
 import { Component, inject, input } from '@angular/core';
-import { AuthUser } from '../../../models/auth-user.model';
 import { AuthService } from '../../../services/auth-service';
 import { NgClass } from '@angular/common';
+import { User } from '../../../models/user.model';
 
 @Component({
     selector: 'app-sidebar-header',
@@ -10,6 +10,6 @@ import { NgClass } from '@angular/common';
     imports: [NgClass],
 })
 export class SidebarHeader {
-    readonly user = input.required<AuthUser | null>();
+    readonly user = input.required<User | null>();
     authService = inject(AuthService);
 }

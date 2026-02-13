@@ -1,7 +1,7 @@
 import { Component, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthUser } from '../../../models/auth-user.model';
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-navbar-user-menu',
@@ -11,7 +11,7 @@ import { AuthUser } from '../../../models/auth-user.model';
   styleUrl: '../navbar.css',
 })
 export class NavbarUserMenu {
-  user = input.required<AuthUser | null>();
+  user = input.required<User | null>();
   showDropdown = signal(false);
 
   toggleDropdown() {
