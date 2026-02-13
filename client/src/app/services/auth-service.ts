@@ -25,7 +25,10 @@ interface LoginCredentials {
   password: string;
 }
 
-interface LogoutResponse { status: string, message: string };
+interface LogoutResponse {
+  status: string;
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +43,6 @@ export class AuthService {
 
   isAuthenticated = computed(() => !!this.currentUser() && !!this.token());
   userName = computed(() => this.currentUser()?.username ?? 'Guest');
-
 
   constructor() {
     this.loadFromStorage();
@@ -73,13 +75,13 @@ export class AuthService {
   }
 
   logout(): Observable<LogoutResponse> {
-    return this.httpClient.post<LogoutResponse>(`${this.BASE_URL}/logout`, null)
-      .pipe(
-        tap(() => this.router.navigate(['/auth/login']))
-      );
+    return this.httpClient
+      .post<LogoutResponse>(`${this.BASE_URL}/logout`, null)
+      .pipe(tap(() => this.router.navigate(['/login'])));
   }
 
   private handleAuthSuccess(response: AuthResponse) {
+    console.log('Authentication successful:', response);
     this.currentUser.set(response.data.user);
     this.token.set(response.token);
 

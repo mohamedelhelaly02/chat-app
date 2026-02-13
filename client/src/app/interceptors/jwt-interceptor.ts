@@ -5,12 +5,10 @@ import { catchError, throwError } from 'rxjs';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  // read token from localstorage
   const token = localStorage.getItem('token');
-  const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+  const isAuthRequest = req.url.includes('/login') || req.url.includes('/register');
   let authRequest = req;
   if (token && !isAuthRequest) {
-    // set jwt token to authorization request header
     authRequest = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
   }
   return next(authRequest).pipe(
@@ -18,7 +16,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 403) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        router.navigate(['/auth/login']);
+        router.navigate(['/login']);
       }
 
       return throwError(() => error);

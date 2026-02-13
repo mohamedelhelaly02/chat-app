@@ -32,7 +32,7 @@ export class Login {
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          err.error?.message || 'فشل تسجيل الدخول. تحقق من البريد وكلمة المرور.',
+          err.error?.message || 'Failed to login. Please check your credentials and try again.',
         );
       },
     });
