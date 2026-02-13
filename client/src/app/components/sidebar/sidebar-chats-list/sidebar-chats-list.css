@@ -1,0 +1,23 @@
+.chats-list {
+    flex: 1;
+    overflow-y: auto;
+    background: #fff;
+    min-height: 0;
+}
+
+.chats-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chats-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chats-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.chats-list::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}

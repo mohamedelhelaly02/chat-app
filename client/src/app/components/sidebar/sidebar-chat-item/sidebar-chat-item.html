@@ -1,0 +1,18 @@
+<div class="chat-item" [class.active]="isActive()">
+    <img [src]="avatar()" [alt]="name()" class="chat-avatar">
+    <div class="chat-info">
+        <div class="chat-header-row">
+            <h4 class="chat-name">{{ name() }}</h4>
+            <span class="chat-time">{{ time() }}</span>
+        </div>
+        <div class="chat-message-row">
+            <p class="chat-last-message">
+                <ng-content></ng-content>
+            </p>
+
+            @if (unreadCount() > 0) {
+            <span class="unread-badge">{{ unreadCount() }}</span>
+            }
+        </div>
+    </div>
+</div>

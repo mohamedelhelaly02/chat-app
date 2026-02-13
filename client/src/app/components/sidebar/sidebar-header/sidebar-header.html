@@ -1,0 +1,20 @@
+<div class="sidebar-header">
+  <div class="user-profile">
+    <img [src]="user()?.avatar" [alt]="user()?.username + ' Avatar'" class="profile-avatar" />
+    <div class="profile-info">
+      <h3 class="profile-name">{{ user()?.username }}</h3>
+      <span class="profile-status" [ngClass]="{ 'online': authService.isAuthenticated() }">{{
+        authService.isAuthenticated() ? 'متصل' : 'غير متصل' }}</span>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button class="icon-btn" title="New">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        <line x1="12" y1="9" x2="12" y2="15"></line>
+        <line x1="9" y1="12" x2="15" y2="12"></line>
+      </svg>
+    </button>
+  </div>
+</div>
