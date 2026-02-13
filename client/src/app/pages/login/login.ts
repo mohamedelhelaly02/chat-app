@@ -16,6 +16,7 @@ export class Login {
 
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
+  showPassword = signal(false);
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -30,8 +31,14 @@ export class Login {
       next: () => this.isLoading.set(false),
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'فشل تسجيل الدخول. تحقق من البريد وكلمة المرور.');
+        this.errorMessage.set(
+          err.error?.message || 'فشل تسجيل الدخول. تحقق من البريد وكلمة المرور.',
+        );
       },
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update((value) => !value);
   }
 }
