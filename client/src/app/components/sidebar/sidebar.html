@@ -1,0 +1,168 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <div class="user-profile">
+            <img src="https://i.pravatar.cc/150?img=12" alt="User Avatar" class="profile-avatar">
+            <div class="profile-info">
+                <h3 class="profile-name">أحمد محمد</h3>
+                <span class="profile-status online">متصل</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="icon-btn" title="محادثة جديدة">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    <line x1="12" y1="9" x2="12" y2="15"></line>
+                    <line x1="9" y1="12" x2="15" y2="12"></line>
+                </svg>
+            </button>
+
+            <button class="icon-btn" title="المزيد">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" placeholder="بحث أو بدء محادثة جديدة">
+        </div>
+    </div>
+
+    <div class="chat-filters">
+        <button class="filter-btn active">الكل</button>
+        <button class="filter-btn">غير مقروء</button>
+        <button class="filter-btn">المجموعات</button>
+    </div>
+
+    <div class="chats-list">
+        <!-- Chat Item 1 -->
+        <div class="chat-item active">
+            <img src="https://i.pravatar.cc/150?img=1" alt="User" class="chat-avatar">
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <h4 class="chat-name">سارة أحمد</h4>
+                    <span class="chat-time">10:30 ص</span>
+                </div>
+                <div class="chat-message-row">
+                    <p class="chat-last-message">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34B7F1" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        شكراً جزيلاً! سأراك لاحقاً
+                    </p>
+                    <span class="unread-badge">3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Item 2 -->
+        <div class="chat-item">
+            <img src="https://i.pravatar.cc/150?img=33" alt="User" class="chat-avatar">
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <h4 class="chat-name">محمد علي</h4>
+                    <span class="chat-time">أمس</span>
+                </div>
+                <div class="chat-message-row">
+                    <p class="chat-last-message">هل انتهيت من المشروع؟</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Item 3 - Group -->
+        <div class="chat-item">
+            <div class="chat-avatar group-avatar">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                </svg>
+            </div>
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <h4 class="chat-name">مجموعة العمل</h4>
+                    <span class="chat-time">السبت</span>
+                </div>
+                <div class="chat-message-row">
+                    <p class="chat-last-message">
+                        <span class="sender-name">فاطمة:</span>
+                        تم إرسال الملفات
+                    </p>
+                    <span class="unread-badge">12</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Item 4 -->
+        <div class="chat-item">
+            <img src="https://i.pravatar.cc/150?img=8" alt="User" class="chat-avatar">
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <h4 class="chat-name">خالد يوسف</h4>
+                    <span class="chat-time">الجمعة</span>
+                </div>
+                <div class="chat-message-row">
+                    <p class="chat-last-message">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        تمام، موافق
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Item 5 -->
+        <div class="chat-item">
+            <img src="https://i.pravatar.cc/150?img=45" alt="User" class="chat-avatar">
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <h4 class="chat-name">نور الدين</h4>
+                    <span class="chat-time">الخميس</span>
+                </div>
+                <div class="chat-message-row">
+                    <p class="chat-last-message">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        صورة
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Item 6 -->
+        <div class="chat-item">
+            <img src="https://i.pravatar.cc/150?img=20" alt="User" class="chat-avatar">
+            <div class="chat-info">
+                <div class="chat-header-row">
+                    <h4 class="chat-name">ليلى حسن</h4>
+                    <span class="chat-time">الأربعاء</span>
+                </div>
+                <div class="chat-message-row">
+                    <p class="chat-last-message">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        ملف.pdf
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,16 +1,27 @@
 import { Routes } from '@angular/router';
-import { NotFound } from './shared/components/not-found/not-found';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'chat', pathMatch: 'full' },
   {
-    path: 'chat',
-    loadChildren: () =>
-      import('./features/chat/chat.routes').then((r) => r.CHAT_ROUTES),
+    path: 'blank',
+    loadComponent: () => import('./layouts/blank-layout/blank-layout').then(c => c.BlankLayout),
+    children: [
+    ]
   },
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
-  },
-  { path: '**', component: NotFound, title: '404 not found' },
+    loadComponent: () => import('./layouts/auth-layout/auth-layout').then(c => c.AuthLayout),
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      {
+        path: 'register',
+        loadComponent: () => import("./pages/register/register").then(c => c.Register),
+        title: 'Register'
+      },
+      {
+        path: 'login',
+        loadComponent: () => import('./pages/login/login').then((r) => r.Login),
+        title: 'Login'
+      }
+    ]
+  }
 ];

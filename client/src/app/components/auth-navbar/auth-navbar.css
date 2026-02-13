@@ -1,0 +1,92 @@
+/* WhatsApp-style auth navbar */
+.auth-navbar {
+  background: #075e54;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.auth-navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  min-height: 56px;
+}
+
+.auth-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.auth-navbar-brand:hover {
+  opacity: 0.95;
+}
+
+.auth-navbar-logo svg {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.auth-navbar-app-name {
+  letter-spacing: -0.3px;
+}
+
+.auth-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-navbar-link {
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.auth-navbar-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.auth-navbar-link.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.auth-navbar-btn {
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.auth-navbar-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.auth-navbar-btn.active {
+  background: #25d366;
+  color: #fff;
+}
+
+.auth-navbar-btn.active:hover {
+  background: #1da851;
+}

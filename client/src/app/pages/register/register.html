@@ -1,0 +1,73 @@
+<div class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-card-head">
+      <div class="auth-logo">
+        <svg width="56" height="56" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="38" fill="#25D366" stroke="#fff" stroke-width="3" />
+          <path
+            d="M40 20C28.95 20 20 28.95 20 40c0 3.54.92 6.87 2.55 9.75L20 60l10.5-2.5C33.38 59.18 36.58 60 40 60c11.05 0 20-8.95 20-20S51.05 20 40 20z"
+            fill="#fff" />
+        </svg>
+      </div>
+      <h1 class="auth-title">إنشاء حساب جديد</h1>
+      <p class="auth-tagline">انضم إلى ChatLink وابدأ المحادثة</p>
+    </div>
+
+    <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      @if (errorMessage()) {
+        <div class="auth-error" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="form-group">
+        <label class="form-label" for="reg-username">اسم المستخدم</label>
+        <input
+          id="reg-username"
+          type="text"
+          formControlName="username"
+          class="form-control"
+          placeholder="اختر اسم المستخدم"
+          autocomplete="username" />
+        @if (registerForm.get('username')?.invalid && registerForm.get('username')?.touched) {
+          <span class="form-error">اسم المستخدم حرفان على الأقل</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reg-email">البريد الإلكتروني</label>
+        <input
+          id="reg-email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="example@email.com"
+          autocomplete="email" />
+        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+          <span class="form-error">أدخل بريداً إلكترونياً صالحاً</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reg-password">كلمة المرور</label>
+        <input
+          id="reg-password"
+          type="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="••••••••"
+          autocomplete="new-password" />
+        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+          <span class="form-error">كلمة المرور 6 أحرف على الأقل</span>
+        }
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading()">
+        {{ isLoading() ? 'جاري التسجيل...' : 'إنشاء الحساب' }}
+      </button>
+
+      <p class="auth-switch">
+        لديك حساب بالفعل؟
+        <a routerLink="/auth/login" class="auth-switch-link">تسجيل الدخول</a>
+      </p>
+    </form>
+  </div>
+</div>
