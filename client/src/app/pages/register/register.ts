@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { SocketService } from '../../services/socket-service';
 
 @Component({
   selector: 'app-register',
@@ -13,6 +14,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class Register {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly socketService = inject(SocketService);
 
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
@@ -32,7 +34,12 @@ export class Register {
     }
     this.isLoading.set(true);
     this.authService.register(this.registerForm.getRawValue()).subscribe({
-      next: () => this.isLoading.set(false),
+      next: () => {
+        this.isLoading.set(false);
+
+        this.socketService.emit('user:registered', { userId: this.authService.currentUser()?._id });
+
+      },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
         this.errorMessage.set(

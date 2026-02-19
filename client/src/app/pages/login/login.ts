@@ -37,7 +37,7 @@ export class Login {
 
         console.log('Current user ID:', this.authService.currentUser()?._id);
 
-        this.socketService.emit('userLoggedIn', { userId: this.authService.currentUser()?._id });
+        this.socketService.emit('user:login', { userId: this.authService.currentUser()?._id });
 
       },
       error: (err: HttpErrorResponse) => {
