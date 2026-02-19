@@ -30,6 +30,16 @@ const handleUserEvents = (io, socket) => {
         socket.broadcast.emit('user:statusChanged', { userId, online: true, username: updatedUser.username });
 
     });
+
+    socket.on('user:logout', async ({ userId }) => {
+        console.log(`User with socket id: ${socket.id} logged out`);
+        console.log(`User with id: ${userId} logged out`);
+
+        const updatedUser = await User.findByIdAndUpdate(userId, { online: false, lastSeen: new Date() });
+
+        socket.broadcast.emit('user:statusChanged', { userId, online: false, username: updatedUser.username });
+
+    });
 }
 
 module.exports = { handleUserEvents };

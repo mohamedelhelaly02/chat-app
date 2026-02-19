@@ -28,6 +28,10 @@ export class SidebarChatsList implements OnInit {
         this.socketService.on('user:online').subscribe((data: any) => {
             this.chatService.updateUserOnlineStatus(data.userId, data.online);
         });
+
+        this.socketService.on('user:statusChanged').subscribe((data: any) => {
+            this.chatService.updateUserOnlineStatus(data.userId, data.online);
+        });
     }
 
     selectChat(chatId: string): void {

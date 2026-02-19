@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { User } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth-service';
+import { SocketService } from '../../../services/socket-service';
 
 @Component({
   selector: 'app-navbar-user-menu',
@@ -15,6 +16,7 @@ export class NavbarUserMenu {
   authService = inject(AuthService);
   user = input.required<User | null>();
   showDropdown = signal(false);
+  private readonly socketService = inject(SocketService);
 
   toggleDropdown() {
     this.showDropdown.set(!this.showDropdown());
@@ -29,8 +31,12 @@ export class NavbarUserMenu {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
 
+      this.socketService.emit('user:logout', { userId: this.authService.currentUser()?._id });
+
       this.authService.currentUser.set(null);
       this.authService.token.set(null);
+
+
 
     })
   }
