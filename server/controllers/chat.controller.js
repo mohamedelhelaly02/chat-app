@@ -32,6 +32,9 @@ const getAllChats = asyncHandler(async (req, res, next) => {
 
     const chatsWithUnread = chats.map(chat => {
         const chatObj = chat.toObject();
+
+        chatObj.participants = chatObj.participants.filter(p => p._id.toString() !== req.userId.toString());
+
         chatObj.unreadCount = chat.unreadCount.get(req.userId.toString()) || 0;
         return chatObj;
     });

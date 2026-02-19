@@ -11,9 +11,15 @@ const { chatRouter } = require('../server/routes/chat.routes');
 const { usersRouter } = require('../server/routes/user.routes');
 const { globalErrorHandler } = require('./middlewares/globalErrorHandler');
 const path = require('path');
+const { seedUsers } = require('./utils/seedUsers');
+const { seedChats } = require('./utils/seedChats');
 
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to mongodb'))
+    .then(() => {
+        console.log('Connected to mongodb');
+        seedUsers();
+        seedChats();
+    })
     .catch((err) => console.error(`Connection error: ${err}`));
 
 const app = express();
@@ -35,6 +41,10 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/chats', chatRouter);
 app.use('/api/v1/users', usersRouter);
 app.use(globalErrorHandler);
+
+io.on('connection', (socket) => {
+    console.log(`User connected with socket id: ${socket.id}`);
+});
 
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

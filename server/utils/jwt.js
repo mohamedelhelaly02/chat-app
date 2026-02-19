@@ -7,10 +7,10 @@ const generateAccessToken = (user) => {
     };
 
     const options = {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-        issuer: process.env.JWT_VALID_ISSUER,
-        audience: process.env.JWT_VALID_AUDIENCE,
-        algorithm: process.env.JWT_ALGORITHM
+        expiresIn: '30m',
+        issuer: 'chatapp',
+        audience: 'chatapp',
+        algorithm: 'HS256'
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, options);
