@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '../../../services/chat-service';
-import { AuthService } from '../../../services/auth-service';
+import { SocketService } from '../../../services/socket-service';
 
 @Component({
     selector: 'app-sidebar-chats-list',
@@ -11,7 +11,8 @@ import { AuthService } from '../../../services/auth-service';
 })
 export class SidebarChatsList implements OnInit {
     private readonly chatService = inject(ChatService);
-    private readonly authService = inject(AuthService);
+    private readonly socketService = inject(SocketService);
+
     chats = this.chatService.chats;
     isLoadingChats = this.chatService.isLoadingChats;
     chatsError = this.chatService.chatsError;
@@ -19,8 +20,14 @@ export class SidebarChatsList implements OnInit {
     isLoadingMessages = this.chatService.isLoadingMessages;
     messagesError = this.chatService.messagesError;
 
-    ngOnInit(): void {
+    constructor() {
         this.chatService.loadChats();
+    }
+
+    ngOnInit(): void {
+        this.socketService.on('user:online').subscribe((data: any) => {
+            this.chatService.updateUserOnlineStatus(data.userId, data.online);
+        });
     }
 
     selectChat(chatId: string): void {

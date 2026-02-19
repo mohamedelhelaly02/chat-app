@@ -158,4 +158,19 @@ export class ChatService {
     next[index] = incoming;
     return next;
   }
+
+  updateUserOnlineStatus(userId: string, online: boolean) {
+    console.log(`Updating online status for user ${userId} to ${online}`);
+    return this.chats.update((prev) => {
+      return prev.map((chat) => {
+        const updatedUsers = chat.participants.map((p) => {
+          if (p._id === userId) {
+            return { ...p, online };
+          }
+          return p;
+        });
+        return { ...chat, participants: updatedUsers };
+      });
+    });
+  }
 }
