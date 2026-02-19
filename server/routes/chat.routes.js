@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getOrCreateChat, getAllChats } = require('../controllers/chat.controller');
+const { getOrCreateChat, getAllChats, getChatById } = require('../controllers/chat.controller');
 const { getAllMessages, createTextMessage, deleteMessage } = require('../controllers/messages.controller');
 const authMiddleware = require('../middlewares/authMiddleware');
 const { getOrCreateChatValidator } = require('../validators/chatValidationSchema');
@@ -17,6 +17,11 @@ router.route('')
         authMiddleware,
         getAllChats
     );
+
+router.get('/:chatId',
+    authMiddleware,
+    getChatById
+);
 
 router.get('/:chatId/messages',
     authMiddleware,

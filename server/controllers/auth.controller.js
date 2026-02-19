@@ -31,7 +31,7 @@ const register = asyncHandler(async (req, res, next) => {
         token: accessToken,
         data: {
             user: {
-                id: user._id,
+                _id: user._id,
                 username: user.username,
                 email: user.email,
                 avatar: user.avatar
@@ -65,7 +65,7 @@ const login = asyncHandler(async (req, res, next) => {
         token: accessToken,
         data: {
             user: {
-                id: user._id,
+                _id: user._id,
                 username: user.username,
                 email: user.email,
                 avatar: user.avatar

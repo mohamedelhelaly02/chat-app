@@ -13,7 +13,69 @@
     background: #efeae2;
 }
 
-/* Chat header styles */
+/* Empty State Styles */
+.empty-state,
+.loading-state,
+.error-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px;
+}
+
+.empty-state svg,
+.error-state svg {
+    color: #ccc;
+    opacity: 0.6;
+}
+
+.empty-state h2,
+.loading-state p,
+.error-state p {
+    margin: 0;
+    text-align: center;
+}
+
+.empty-state h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.empty-state p,
+.error-state p {
+    font-size: 14px;
+    color: #666;
+}
+
+.error {
+    color: #d32f2f !important;
+    font-weight: 500;
+}
+
+/* Loading State */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f0f0f0;
+    border-top: 4px solid #25d366;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .chat-header {
     display: flex;
     align-items: center;
@@ -22,6 +84,28 @@
     background: #fff;
     border-bottom: 1px solid #e5e5ea;
     flex-shrink: 0;
+}
+
+.chat-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #000;
+}
+
+.chat-header .status {
+    font-size: 12px;
+    color: #999;
+    display: block;
+    margin-top: 2px;
 }
 
 .chat-header-info {
@@ -96,6 +180,12 @@
     flex-direction: column;
     gap: 12px;
     min-height: 0;
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .messages-container::-webkit-scrollbar {

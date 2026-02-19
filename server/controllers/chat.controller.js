@@ -42,4 +42,26 @@ const getAllChats = asyncHandler(async (req, res, next) => {
     return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chats: chatsWithUnread } });
 });
 
-module.exports = { getOrCreateChat, getAllChats };
+const getChatById = asyncHandler(async (req, res, next) => {
+    const { chatId } = req.params;
+    const chat = await Chat.findById(chatId)
+        .populate('participants', '_id username email avatar online lastSeen')
+        .populate({
+            path: 'lastMessage',
+            populate: {
+                path: 'sender',
+                select: 'username avatar'
+            }
+        });
+
+    if (!chat) {
+        return next(appError.create('Chat not found', 404, httpStatusText.FAIL));
+    }
+
+    const chatObj = chat.toObject();
+    chatObj.participants = chatObj.participants.filter(p => p._id.toString() !== req.userId.toString());
+
+    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chat: chatObj } });
+});
+
+module.exports = { getOrCreateChat, getAllChats, getChatById };

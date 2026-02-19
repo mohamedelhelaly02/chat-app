@@ -1,0 +1,11 @@
+@if (message()) {
+<div class="message">
+    <div class="message-header">
+        <span class="sender-name">{{ message().sender.username }}</span>
+        <span class="timestamp">{{ message().createdAt }}</span>
+    </div>
+    <div class="message-content">
+        {{ message().content }}
+    </div>
+</div>
+}

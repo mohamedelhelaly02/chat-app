@@ -58,7 +58,7 @@ export class ChatService {
   isLoadingMessages: WritableSignal<boolean> = signal<boolean>(false);
   chatsError: WritableSignal<string | null> = signal<string | null>(null);
   messagesError: WritableSignal<string | null> = signal<string | null>(null);
-  selectedChatId: WritableSignal<string | null> = signal<string | null>(null);
+  selectedChatId: WritableSignal<string> = signal<string>('');
 
   getOrCreateChat(userId: string): Observable<ChatResponse> {
     return this.httpClient

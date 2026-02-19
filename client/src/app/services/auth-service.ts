@@ -83,6 +83,9 @@ export class AuthService {
   private handleAuthSuccess(response: AuthResponse) {
     console.log('Authentication successful:', response);
     this.currentUser.set(response.data.user);
+
+    console.log('Setting User:', this.currentUser());
+
     this.token.set(response.token);
 
     localStorage.setItem('user', JSON.stringify(response.data.user));

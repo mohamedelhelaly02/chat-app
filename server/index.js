@@ -13,6 +13,7 @@ const { globalErrorHandler } = require('./middlewares/globalErrorHandler');
 const path = require('path');
 const { seedUsers } = require('./utils/seedUsers');
 const { seedChats } = require('./utils/seedChats');
+const { handleUserEvents } = require('./utils/handleUserEvents');
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
@@ -44,6 +45,15 @@ app.use(globalErrorHandler);
 
 io.on('connection', (socket) => {
     console.log(`User connected with socket id: ${socket.id}`);
+    const userId = socket.handshake.query.userId;
+    socket.join(userId);
+
+    handleUserEvents(io, socket);
+
+    socket.on('disconnect', () => {
+        console.log(`User with socket id: ${socket.id} disconnected`);
+    });
+
 });
 
 server.listen(PORT, () => {

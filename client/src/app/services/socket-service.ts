@@ -1,6 +1,7 @@
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { Injectable, signal, WritableSignal, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root',
@@ -8,18 +9,25 @@ import { io, Socket } from 'socket.io-client';
 export class SocketService {
   private socket!: Socket;
   private readonly socketUrl = 'http://localhost:4000';
+  private authService = inject(AuthService);
   isConnected: WritableSignal<boolean> = signal<boolean>(false);
   connectionError: WritableSignal<string | null> = signal<string | null>(null);
+
 
   constructor() {
     this.initializeSocket();
   }
 
   private initializeSocket(): void {
+    const userId = this.authService.currentUser()?._id || '';
+
     this.socket = io(this.socketUrl, {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-      reconnection: true
+      reconnection: true,
+      query: {
+        userId: userId
+      }
     });
 
 
