@@ -15,15 +15,17 @@ export class SidebarChatsList implements OnInit {
     chats = this.chatService.chats;
     isLoadingChats = this.chatService.isLoadingChats;
     chatsError = this.chatService.chatsError;
+    messages = this.chatService.messages;
+    isLoadingMessages = this.chatService.isLoadingMessages;
+    messagesError = this.chatService.messagesError;
 
     ngOnInit(): void {
         this.chatService.loadChats();
     }
 
-    getOtherParticipant(participants: any[]) {
-        return participants.find(p => p._id !== this.authService.currentUser()?._id);
-    }
-
     selectChat(chatId: string): void {
+        console.log('Selected chat ID:', chatId);
+        this.chatService.loadMessages(chatId);
+        console.log('Messages for selected chat:', this.messages());
     }
 }

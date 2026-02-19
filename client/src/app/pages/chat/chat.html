@@ -1,3 +1,15 @@
 <div class="chats-page">
   <app-sidebar></app-sidebar>
+  <div class="chat-area">
+
+    @if(selectedChatId()) {
+    <app-chat-area></app-chat-area>
+    } @else {
+    <div class="no-chat-selected">
+      <h1>Chatlink Web</h1>
+      <p>Select a chat to start messaging</p>
+    </div>
+    }
+
+  </div>
 </div>

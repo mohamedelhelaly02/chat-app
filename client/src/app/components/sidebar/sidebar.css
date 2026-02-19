@@ -1,11 +1,12 @@
 .sidebar {
-  width: 400px;
   background: #fff;
-  border-left: 1px solid #e5e5ea;
+  border-right: 1px solid #e5e5ea;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .sidebar-header {
@@ -40,6 +41,7 @@
   object-fit: cover;
   border: none;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .user-profile:hover .profile-avatar {
@@ -50,6 +52,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
 .profile-name {
@@ -79,7 +82,18 @@
 }
 
 .header-actions .icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667781;
   transition: all 0.2s ease;
+  padding: 0;
 }
 
 .header-actions .icon-btn:hover {
@@ -88,6 +102,7 @@
   transform: scale(1.05);
 }
 
+/* Search container */
 .search-container {
   padding: 8px 16px;
   background: #fff;
@@ -114,6 +129,8 @@
 .search-box svg {
   color: #999;
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .search-box input {
@@ -124,6 +141,8 @@
   width: 100%;
   color: #000;
   transition: color 0.2s ease;
+  font-family: inherit;
+  outline: none;
 }
 
 .search-box input::placeholder {
@@ -135,22 +154,7 @@
   color: #000;
 }
 
-.chat-filters {
-  display: none;
-}
-
-.filter-btn {
-  display: none;
-}
-
-.filter-btn:hover {
-  display: none;
-}
-
-.filter-btn.active {
-  display: none;
-}
-
+/* Chat list styles */
 .chats-list {
   flex: 1;
   overflow-y: auto;
@@ -191,8 +195,8 @@
 
 .chat-item.active {
   background: #f0f0f0;
-  border-left: none;
-  padding-left: 16px;
+  border-left: 4px solid #25d366;
+  padding-left: 12px;
 }
 
 .chat-avatar {
@@ -217,7 +221,6 @@
   justify-content: center;
   font-weight: 600;
   font-size: 18px;
-  display: none;
 }
 
 .chat-info {
@@ -280,7 +283,6 @@
 .sender-name {
   color: #000;
   font-weight: 500;
-  display: none;
 }
 
 .unread-badge {
@@ -299,7 +301,7 @@
   box-shadow: none;
 }
 
-/* Responsive */
+/* Responsive styles */
 @media (max-width: 1024px) {
   .sidebar {
     width: 350px;
@@ -311,11 +313,11 @@
     width: 100%;
     position: absolute;
     left: 0;
-    top: 60px;
+    top: 0;
     right: 0;
     z-index: 50;
-    border-left: none;
     border-right: none;
+    border-bottom: 1px solid #e5e5ea;
   }
 
   .chat-item {

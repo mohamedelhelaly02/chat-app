@@ -58,7 +58,7 @@ export class ChatService {
   isLoadingMessages: WritableSignal<boolean> = signal<boolean>(false);
   chatsError: WritableSignal<string | null> = signal<string | null>(null);
   messagesError: WritableSignal<string | null> = signal<string | null>(null);
-  selectedUser: WritableSignal<string | null> = signal<string | null>(null);
+  selectedChatId: WritableSignal<string | null> = signal<string | null>(null);
 
   getOrCreateChat(userId: string): Observable<ChatResponse> {
     return this.httpClient
@@ -85,6 +85,7 @@ export class ChatService {
         next: (response) => {
           this.chats.set(response.data.chats);
           this.isLoadingChats.set(false);
+
         },
         error: () => {
           this.chatsError.set('تعذر تحميل المحادثات.');
@@ -94,6 +95,7 @@ export class ChatService {
   }
 
   getMessages(chatId: string): Observable<MessagesResponse> {
+    this.selectedChatId.set(chatId);
     return this.httpClient
       .get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`, {
         headers: this.getAuthHeaders(),

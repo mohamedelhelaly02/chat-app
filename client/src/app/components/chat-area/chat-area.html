@@ -1,0 +1,33 @@
+<div class="chat-area">
+    @if (!selectedChatMessages() && !isLoadingMessages() && !messagesError()) {
+    <p>Select a chat to start messaging</p>
+    }
+
+    @if (isLoadingMessages()) {
+    <p>Loading messages...</p>
+    }
+
+    @if (messagesError()) {
+    <p class="error">Error loading messages: {{ messagesError() }}</p>
+    }
+
+
+    @if(selectedChatMessages().length === 0) {
+    <p>No messages yet. Start the conversation!</p>
+    }
+    @else {
+    <div class="messages">
+        @for (message of selectedChatMessages()!; track message._id) {
+        <div class="message">
+            <div class="message-header">
+                <span class="sender-name">{{ message.sender.username }}</span>
+                <span class="timestamp">{{ message.createdAt }}</span>
+            </div>
+            <div class="message-content">
+                {{ message.content }}
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>
