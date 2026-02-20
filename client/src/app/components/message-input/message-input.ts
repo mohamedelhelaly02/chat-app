@@ -37,13 +37,21 @@ export class MessageInput {
       console.log('Selected User ID:', this.selectedUserId());
       console.log('Chat ID:', this.chatId());
       this.chatService.sendTextMessage(this.chatId(), this.messageText)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          console.log('Message sent successfully:', response);
-          this.messageText = '';
-        }
-      });
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (response) => {
+            console.log('Message sent successfully:', response);
+            this.messageText = '';
+
+            this.socketService.emit('user:new_message',
+              {
+                toUserId: this.selectedUserId(),
+                fromUserId: this.fromUserId,
+                message: response.data.message
+              });
+
+          }
+        });
     }
   }
 
@@ -60,7 +68,7 @@ export class MessageInput {
     clearTimeout(this.typingTimeout);
 
     this.typingTimeout = setTimeout(() => {
-          this.socketService.emit('user:typing', { toUserId: this.selectedUserId(), fromUserId: this.fromUserId, isTyping: false });
+      this.socketService.emit('user:typing', { toUserId: this.selectedUserId(), fromUserId: this.fromUserId, isTyping: false });
     }, 3000);
   }
 

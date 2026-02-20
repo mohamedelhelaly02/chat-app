@@ -1,4 +1,5 @@
 const { User } = require('../models/user.model');
+const { Chat } = require('../models/chat.model');
 
 const handleUserEvents = (io, socket) => {
     socket.on('user:login', async ({ userId }) => {
@@ -59,6 +60,31 @@ const handleUserEvents = (io, socket) => {
         }
 
         io.to(toUserId).emit('user:typing', { userId: fromUserId, isTyping });
+    });
+
+    socket.on('user:new_message', async ({ toUserId, fromUserId, message }) => {
+        try {
+
+            if (!message)
+                return;
+
+            const updatedChat = await Chat.findOne({ _id: message.chat })
+                .populate('participants', 'username email avatar online lastSeen')
+                .populate({
+                    path: 'lastMessage',
+                    populate: {
+                        path: 'sender',
+                        select: 'username avatar'
+                    }
+                });
+
+            io.to(toUserId).emit('chat:updated', { chat: updatedChat });
+            io.to(fromUserId).emit('chat:updated', { chat: updatedChat });
+
+
+        } catch (error) {
+            console.error('Error emitting new message:', error);
+        }
     });
 
 }

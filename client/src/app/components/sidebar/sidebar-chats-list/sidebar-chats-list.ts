@@ -42,9 +42,27 @@ export class SidebarChatsList implements OnInit {
             });
 
         this.socketService.on('user:typing')
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((data: any) => {
                 this.chatService.setTyping(data.userId, data.isTyping);
-            })
+            });
+
+
+        this.socketService.on('chat:updated')
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((data: any) => {
+                const updatedChat = data.chat;
+                this.chatService.chats.update((chats) => {
+                    const index = chats.findIndex(c => c._id === updatedChat._id);
+                    if (index !== -1) {
+                        chats[index] = updatedChat;
+                    } else {
+                        chats.unshift(updatedChat);
+                    }
+
+                    return [...chats];
+                })
+            });
     }
 
     selectChat(chatId: string): void {
