@@ -40,6 +40,20 @@ const handleUserEvents = (io, socket) => {
         socket.broadcast.emit('user:statusChanged', { userId, online: false, username: updatedUser.username });
 
     });
+
+    socket.on('user:typing', async ({ userId, isTyping }) => {
+        console.log(`User with id: ${userId} is ${isTyping ? 'typing...' : 'stopped typing'}`);
+        const user = await User.findById(userId);
+
+        if (!user) {
+            console.error(`User with id: ${userId} not found`);
+            return;
+        }
+
+        io.to(userId).emit('user:typing', { userId, isTyping, username: user.username });
+
+    });
+
 }
 
 module.exports = { handleUserEvents };

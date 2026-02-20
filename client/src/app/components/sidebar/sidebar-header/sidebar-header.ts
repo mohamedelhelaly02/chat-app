@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, ViewChild } from '@angular/core';
 import { AuthService } from '../../../services/auth-service';
 import { NgClass } from '@angular/common';
 import { User } from '../../../models/user.model';
@@ -12,4 +12,5 @@ import { User } from '../../../models/user.model';
 export class SidebarHeader {
     readonly user = input.required<User | null>();
     authService = inject(AuthService);
+
 }

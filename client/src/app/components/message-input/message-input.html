@@ -1,6 +1,7 @@
 <div class="message-input-container">
     <div class="message-input">
-        <input type="text" [(ngModel)]="messageText" (keypress)="onKeyPress($event)" [placeholder]="placeholderText()">
+        <input type="text" [(ngModel)]="messageText" (input)="onInput()" (keypress)="onKeyPress($event)"
+            [placeholder]="placeholderText()">
 
 
         <!-- <div class="input-actions">

@@ -1,6 +1,8 @@
-<div *ngIf="isVisible()" [ngClass]="['toast', 'toast-' + toastMessage()?.type]">
+@if (isVisible()) {
+<div [ngClass]="['toast', 'toast-' + toastMessage()?.type]">
     <div class="toast-icon">{{ getIcon() }}</div>
     <div class="toast-content">
         <p class="toast-message">{{ toastMessage()?.message }}</p>
     </div>
 </div>
+}
