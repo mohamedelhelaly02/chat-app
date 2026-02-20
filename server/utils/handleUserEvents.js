@@ -1,5 +1,6 @@
 const { User } = require('../models/user.model');
 const { Chat } = require('../models/chat.model');
+const { Message } = require('../models/message.model');
 
 const handleUserEvents = (io, socket) => {
     socket.on('user:login', async ({ userId }) => {
@@ -91,6 +92,33 @@ const handleUserEvents = (io, socket) => {
 
         } catch (error) {
             console.error('Error emitting new message:', error);
+        }
+    });
+
+    socket.on('user:chat_opened', async ({ chatWithUserId, userId }) => {
+        try {
+            const existedChat = await Chat.getOrCreateChat(userId, chatWithUserId);
+            const result = await Message.updateMany(
+                { chat: existedChat._id, receiver: userId, read: false },
+                { read: true, readAt: new Date() }
+            );
+
+            existedChat.unreadCount.set(userId, 0);
+            await existedChat.save();
+
+            if (result.modifiedCount > 0) {
+                const readMessages = await Message.find({
+                    chat: existedChat._id,
+                    receiver: userId,
+                    read: true
+                });
+
+                console.log("user:chat_opened - read messages: ", readMessages);
+            }
+
+
+        } catch (error) {
+            console.error('chat_opened error:', error);
         }
     });
 

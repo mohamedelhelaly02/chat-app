@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChatService } from '../../../services/chat-service';
 import { SocketService } from '../../../services/socket-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../../services/auth-service';
 
 @Component({
     selector: 'app-sidebar-chats-list',
@@ -14,6 +15,7 @@ export class SidebarChatsList implements OnInit {
     private readonly chatService = inject(ChatService);
     private readonly socketService = inject(SocketService);
     private readonly destroyRef: DestroyRef = inject(DestroyRef);
+    private readonly authService: AuthService = inject(AuthService);
 
     chats = this.chatService.chats;
     isLoadingChats = this.chatService.isLoadingChats;
@@ -66,7 +68,17 @@ export class SidebarChatsList implements OnInit {
 
     selectChat(chatId: string): void {
         console.log('Selected chat ID:', chatId);
+
+        const selectedChat = this.chats().find(c => c._id === chatId);
+
+        console.log("Selected chat: ", selectedChat);
+
         this.chatService.loadMessages(chatId);
-        console.log('Messages for selected chat:', this.messages());
+
+        this.socketService.emit('user:chat_opened',
+            {
+                chatWithUserId: selectedChat?.participants[0]._id,
+                userId: this.authService.currentUser()?._id
+            });
     }
 }
