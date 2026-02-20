@@ -59,6 +59,25 @@ export class ChatService {
   chatsError: WritableSignal<string | null> = signal<string | null>(null);
   messagesError: WritableSignal<string | null> = signal<string | null>(null);
   selectedChatId: WritableSignal<string> = signal<string>('');
+  typingUsers: WritableSignal<Set<string>> = signal<Set<string>>(new Set());
+
+  setTyping(fromUserId: string, isTyping: boolean) {
+    if (!fromUserId) {
+      return;
+    }
+
+    const updated = new Set(this.typingUsers());
+    if (isTyping) {
+      updated.add(fromUserId);
+    } else {
+      updated.delete(fromUserId);
+    }
+
+    this.typingUsers.set(updated);
+  }
+
+
+
 
   getOrCreateChat(userId: string): Observable<ChatResponse> {
     return this.httpClient
@@ -166,6 +185,21 @@ export class ChatService {
         const updatedUsers = chat.participants.map((p) => {
           if (p._id === userId) {
             return { ...p, online };
+          }
+          return p;
+        });
+        return { ...chat, participants: updatedUsers };
+      });
+    });
+  }
+
+  updateUserTypingStatus(userId: string, isTyping: boolean) {
+    console.log(`Updating typing status for user ${userId} to ${isTyping}`);
+    return this.chats.update((prev) => {
+      return prev.map((chat) => {
+        const updatedUsers = chat.participants.map((p) => {
+          if (p._id === userId) {
+            return { ...p, isTyping };
           }
           return p;
         });

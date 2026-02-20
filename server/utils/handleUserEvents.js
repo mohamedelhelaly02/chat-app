@@ -41,17 +41,24 @@ const handleUserEvents = (io, socket) => {
 
     });
 
-    socket.on('user:typing', async ({ userId, isTyping }) => {
-        console.log(`User with id: ${userId} is ${isTyping ? 'typing...' : 'stopped typing'}`);
-        const user = await User.findById(userId);
+    socket.on('user:typing', async ({ toUserId, fromUserId, isTyping }) => {
 
-        if (!user) {
-            console.error(`User with id: ${userId} not found`);
+        if (!toUserId || !fromUserId) {
+            console.warn('Invalid typing payload');
             return;
         }
 
-        io.to(userId).emit('user:typing', { userId, isTyping, username: user.username });
+        console.log(
+            `User ${fromUserId} is ${isTyping ? 'typing...' : 'stopped typing'} to ${toUserId}`
+        );
+        const user = await User.findById(toUserId);
 
+        if (!user) {
+            console.error(`User with id: ${toUserId} not found`);
+            return;
+        }
+
+        io.to(toUserId).emit('user:typing', { userId: fromUserId, isTyping });
     });
 
 }
