@@ -79,15 +79,22 @@ const handleUserEvents = (io, socket) => {
                     }
                 });
 
-            const updatedChatObj = updatedChat.toObject();
-            updatedChatObj.participants = updatedChatObj.participants.filter(
-                (p) => p._id.toString() !== message.sender.toString()
+            const chatForReceiver = updatedChat.toObject();
+            chatForReceiver.participants = chatForReceiver.participants.filter(
+                p => p._id.toString() !== toUserId.toString()
             );
-            updatedChatObj.unreadCount = updatedChatObj.unreadCount.get(toUserId.toString()) || 0;
+            chatForReceiver.unreadCount =
+                updatedChat.unreadCount.get(toUserId.toString()) || 0;
 
+            const chatForSender = updatedChat.toObject();
+            chatForSender.participants = chatForSender.participants.filter(
+                p => p._id.toString() !== fromUserId.toString()
+            );
+            chatForSender.unreadCount =
+                updatedChat.unreadCount.get(fromUserId.toString()) || 0;
 
-            io.to(toUserId).emit('chat:updated', { chat: updatedChatObj });
-            io.to(fromUserId).emit('chat:updated', { chat: updatedChatObj });
+            io.to(toUserId).emit('chat:updated', { chat: chatForReceiver });
+            io.to(fromUserId).emit('chat:updated', { chat: chatForSender });
 
 
         } catch (error) {
