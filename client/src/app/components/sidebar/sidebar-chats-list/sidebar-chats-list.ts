@@ -42,7 +42,6 @@ export class SidebarChatsList implements OnInit {
             });
 
         this.socketService.on('user:typing')
-            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((data: any) => {
                 this.chatService.setTyping(data.userId, data.isTyping);
             })

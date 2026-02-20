@@ -57,6 +57,11 @@ const createTextMessage = asyncHandler(async (req, res, next) => {
     await message.populate('sender', 'username avatar');
     await message.populate('receiver', 'username avatar');
 
+    chat.lastMessage = message._id;
+    chat.updatedAt = new Date();
+
+    await chat.save();
+
     return res.status(201).json({ status: httpStatusText.SUCCESS, data: { message } });
 });
 

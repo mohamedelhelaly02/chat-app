@@ -102,6 +102,7 @@ export class ChatService {
       .get<ChatsResponse>(this.BASE_URL, { headers: this.getAuthHeaders() })
       .subscribe({
         next: (response) => {
+          console.log("Chats loaded: ", response.data.chats);
           this.chats.set(response.data.chats);
           this.isLoadingChats.set(false);
 
