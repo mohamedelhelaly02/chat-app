@@ -60,6 +60,11 @@ const createTextMessage = asyncHandler(async (req, res, next) => {
     chat.lastMessage = message._id;
     chat.updatedAt = new Date();
 
+    if (receiver) {
+        const currentUnreadMessagesCount = chat.unreadCount.get(receiver.toString()) || 0;
+        chat.unreadCount.set(receiver.toString(), currentUnreadMessagesCount + 1);
+    }
+
     await chat.save();
 
     return res.status(201).json({ status: httpStatusText.SUCCESS, data: { message } });

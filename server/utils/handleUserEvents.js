@@ -78,8 +78,15 @@ const handleUserEvents = (io, socket) => {
                     }
                 });
 
-            io.to(toUserId).emit('chat:updated', { chat: updatedChat });
-            io.to(fromUserId).emit('chat:updated', { chat: updatedChat });
+            const updatedChatObj = updatedChat.toObject();
+            updatedChatObj.participants = updatedChatObj.participants.filter(
+                (p) => p._id.toString() !== message.sender.toString()
+            );
+            updatedChatObj.unreadCount = updatedChatObj.unreadCount.get(toUserId.toString()) || 0;
+
+
+            io.to(toUserId).emit('chat:updated', { chat: updatedChatObj });
+            io.to(fromUserId).emit('chat:updated', { chat: updatedChatObj });
 
 
         } catch (error) {

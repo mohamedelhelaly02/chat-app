@@ -52,14 +52,13 @@ export class SidebarChatsList implements OnInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((data: any) => {
                 const updatedChat = data.chat;
+                console.log('Updated chat: ', updatedChat);
                 this.chatService.chats.update((chats) => {
                     const index = chats.findIndex(c => c._id === updatedChat._id);
+
                     if (index !== -1) {
                         chats[index] = updatedChat;
-                    } else {
-                        chats.unshift(updatedChat);
                     }
-
                     return [...chats];
                 })
             });

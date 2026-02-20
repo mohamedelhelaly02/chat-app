@@ -27,8 +27,7 @@ const getAllChats = asyncHandler(async (req, res, next) => {
                 path: 'sender',
                 select: 'username avatar'
             }
-        })
-        .sort({ updatedAt: -1 });
+        });
 
     const chatsWithUnread = chats.map(chat => {
         const chatObj = chat.toObject();
