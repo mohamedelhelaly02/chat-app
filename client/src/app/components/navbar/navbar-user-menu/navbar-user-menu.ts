@@ -27,17 +27,18 @@ export class NavbarUserMenu {
   }
 
   logout() {
+    const loggedInUserId = this.authService.currentUser()?._id;
+
+    this.socketService.emit('user:logout', { userId: loggedInUserId });
+
+    this.socketService.disconnect();
+
     this.authService.logout().subscribe(() => {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
 
-      this.socketService.emit('user:logout', { userId: this.authService.currentUser()?._id });
-
       this.authService.currentUser.set(null);
       this.authService.token.set(null);
-
-
-
-    })
+    });
   }
 }

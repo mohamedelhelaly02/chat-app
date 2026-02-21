@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal, WritableSignal } from '@angular/c
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
+import { SocketService } from './socket-service';
 
 interface RegisterData {
   username: string;
@@ -37,6 +38,7 @@ export class AuthService {
   readonly BASE_URL: string = 'http://localhost:4000/api/v1/auth';
   readonly httpClient = inject(HttpClient);
   readonly router = inject(Router);
+  private readonly socketService: SocketService = inject(SocketService);
 
   currentUser: WritableSignal<User | null> = signal<User | null>(null);
   token: WritableSignal<string | null> = signal<string | null>(null);
@@ -58,12 +60,12 @@ export class AuthService {
     }
   }
 
-  register(registerData: RegisterData): Observable<AuthResponse> {
+  register(registerData: RegisterData): Observable<any> {
     return this.httpClient
-      .post<AuthResponse>(`${this.BASE_URL}/register`, registerData, {
+      .post<any>(`${this.BASE_URL}/register`, registerData, {
         headers: new HttpHeaders().set('Content-Type', 'application/json'),
       })
-      .pipe(tap((authResponse) => this.handleAuthSuccess(authResponse)));
+      .pipe(tap(() => this.handleRegisterSuccess()));
   }
 
   login(credentials: LoginCredentials): Observable<AuthResponse> {
@@ -80,16 +82,27 @@ export class AuthService {
       .pipe(tap(() => this.router.navigate(['/login'])));
   }
 
-  private handleAuthSuccess(response: AuthResponse) {
-    console.log('Authentication successful:', response);
-    this.currentUser.set(response.data.user);
+  refresh(): Observable<{ accessToken: string }> {
+    return this.httpClient.post<{ accessToken: string }>(`${this.BASE_URL}/refresh`, null, {
+      withCredentials: true,
+    });
+  }
 
-    console.log('Setting User:', this.currentUser());
+  private handleRegisterSuccess(): void {
+    this.router.navigate(['/login']);
+  }
+
+  private async handleAuthSuccess(response: AuthResponse) {
+    this.currentUser.set(response.data.user);
 
     this.token.set(response.token);
 
     localStorage.setItem('user', JSON.stringify(response.data.user));
     localStorage.setItem('token', response.token);
+
+    await this.socketService.connect(response.token);
+
+    this.socketService.emit('user:login', { userId: response.data.user._id });
 
     this.router.navigate(['/chat']);
   }

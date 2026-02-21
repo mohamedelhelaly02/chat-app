@@ -32,20 +32,7 @@ const register = asyncHandler(async (req, res, next) => {
 
   await user.save();
 
-  const accessToken = generateAccessToken(user);
-
-  return res.status(201).json({
-    status: "success",
-    token: accessToken,
-    data: {
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
-      },
-    },
-  });
+  return res.status(201).json();
 });
 
 const login = asyncHandler(async (req, res, next) => {

@@ -1,7 +1,6 @@
-import { Injectable, signal, WritableSignal, inject } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,71 +8,88 @@ import { AuthService } from './auth-service';
 export class SocketService {
   private socket!: Socket;
   private readonly socketUrl = 'http://localhost:4000';
-  private authService = inject(AuthService);
   isConnected: WritableSignal<boolean> = signal<boolean>(false);
   connectionError: WritableSignal<string | null> = signal<string | null>(null);
 
-
-  constructor() {
-    this.initializeSocket();
-  }
-
-  private initializeSocket(): void {
-    const userId = this.authService.currentUser()?._id || '';
-
-    this.socket = io(this.socketUrl, {
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      reconnection: true,
-      query: {
-        userId: userId
+  connect(accessToken: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.socket?.connected) {
+        console.log('Already connected');
+        resolve();
+        return;
       }
+
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+      }
+
+      this.socket = io(this.socketUrl, {
+        autoConnect: true,
+        transports: ['websocket'],
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 5,
+        auth: {
+          token: accessToken,
+        },
+      });
+
+      this.socket.on('connect', () => {
+        console.log('Socket connected:', this.socket.id);
+        this.isConnected.set(true);
+        this.connectionError.set(null);
+        resolve();
+      });
+
+      this.socket.on('disconnect', (reason) => {
+        console.log('Socket disconnected, reason:', reason);
+        this.isConnected.set(false);
+      });
+
+      this.socket.on('connect_error', (error) => {
+        console.error('Connection error:', error);
+        this.isConnected.set(false);
+        this.connectionError.set(error.message || 'Connection error');
+        this.socket.disconnect();
+        reject(error);
+      });
     });
-
-
-    this.setupEventListeners();
-
   }
 
-  private setupEventListeners(): void {
-    this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket.id);
-
-      this.isConnected.set(true);
-      this.connectionError.set(null);
-    })
-
-    this.socket.on('disconnect', () => {
-      console.log('Socket disconnected');
+  disconnect(): void {
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
       this.isConnected.set(false);
-    })
 
-    this.socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
-      this.isConnected.set(false);
-      this.connectionError.set(error.message || 'Connection error');
-    });
+      console.log('socket is disconnected successfully');
+    }
   }
 
   emit(event: string, data?: any): void {
     if (this.socket && this.socket.connected) {
       this.socket.emit(event, data);
     } else {
-      console.error('socket is not connected');
+      console.error('Socket is not connected');
     }
   }
 
   on<T>(eventName: string): Observable<T> {
-    return new Observable(observer => {
+    return new Observable((observer) => {
       if (!this.socket) {
-        observer.error('Socket not initialized');
-        return;
+        const interval = setInterval(() => {
+          if (this.socket) {
+            clearInterval(interval);
+            const handler = (data: T) => observer.next(data);
+            this.socket.on(eventName, handler);
+            observer.add(() => this.socket?.off(eventName, handler));
+          }
+        }, 50);
+
+        return () => clearInterval(interval);
       }
 
-      const handler = (data: T) => {
-        observer.next(data);
-      };
-
+      const handler = (data: T) => observer.next(data);
       this.socket.on(eventName, handler);
 
       return () => {
@@ -81,5 +97,4 @@ export class SocketService {
       };
     });
   }
-
 }

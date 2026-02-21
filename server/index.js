@@ -11,10 +11,11 @@ const { chatRouter } = require("../server/routes/chat.routes");
 const { usersRouter } = require("../server/routes/user.routes");
 const { globalErrorHandler } = require("./middlewares/globalErrorHandler");
 const path = require("path");
-const { seedUsers } = require("./utils/seedUsers");
-const { seedChats } = require("./utils/seedChats");
 const { handleUserEvents } = require("./utils/handleUserEvents");
 const cookieParser = require("cookie-parser");
+const appError = require("./utils/appError");
+const httpStatusText = require("./utils/httpStatusText");
+const { verifyJwtToken } = require("./utils/jwt");
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -38,7 +39,12 @@ const io = socketIo(server, {
 });
 
 app.use(morgan("dev"));
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:4200",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -48,10 +54,40 @@ app.use("/api/v1/chats", chatRouter);
 app.use("/api/v1/users", usersRouter);
 app.use(globalErrorHandler);
 
+io.use((socket, next) => {
+  try {
+    const accessToken = socket.handshake.auth.token;
+    console.log(accessToken);
+    if (!accessToken) {
+      return next(
+        appError.create(
+          "Authentication error",
+          401,
+          httpStatusText.UNAUTHORIZED,
+        ),
+      );
+    }
+
+    const decoded = verifyJwtToken(accessToken);
+
+    if (decoded === null) {
+      return next(appError.create("forbidden", 403, httpStatusText.FORBIDDEN));
+    }
+
+    socket.user = decoded;
+
+    next();
+  } catch (error) {
+    return next(
+      appError.create("Authentication error", 401, httpStatusText.UNAUTHORIZED),
+    );
+  }
+});
+
 io.on("connection", (socket) => {
   console.log(`User connected with socket id: ${socket.id}`);
-  const userId = socket.handshake.query.userId;
-  socket.join(userId);
+
+  socket.join( socket.user.id);
 
   handleUserEvents(io, socket);
 

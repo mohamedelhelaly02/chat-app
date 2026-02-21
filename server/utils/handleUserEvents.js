@@ -22,17 +22,6 @@ const handleUserEvents = (io, socket) => {
 
     });
 
-    socket.on('user:registered', async ({ userId }) => {
-        console.log(`User with id: ${userId} registered`);
-
-        const updatedUser = await User.findByIdAndUpdate(userId, { online: true, lastSeen: new Date() });
-
-        // emit to other clients that a new user has registered and is online
-
-        socket.broadcast.emit('user:statusChanged', { userId, online: true, username: updatedUser.username });
-
-    });
-
     socket.on('user:logout', async ({ userId }) => {
         console.log(`User with socket id: ${socket.id} logged out`);
         console.log(`User with id: ${userId} logged out`);
