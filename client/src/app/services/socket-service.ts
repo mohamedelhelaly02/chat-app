@@ -25,10 +25,9 @@ export class SocketService {
       }
 
       this.socket = io(this.socketUrl, {
+        reconnection: true,
         autoConnect: true,
-        transports: ['websocket'],
         reconnectionDelay: 1000,
-        reconnectionAttempts: 5,
         auth: {
           token: accessToken,
         },

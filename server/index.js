@@ -86,7 +86,7 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   console.log(`User connected with socket id: ${socket.id}`);
 
-  socket.join( socket.user.id);
+  socket.join(socket.user.id);
 
   handleUserEvents(io, socket);
 

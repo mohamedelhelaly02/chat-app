@@ -40,3 +40,14 @@
 .status {
     font-size: 12px;
 }
+
+.read-blue {
+    color: #34B7F1; 
+    font-weight: bold;
+}
+
+.mine .message-bubble {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+    border-radius: 10px 10px 0px 10px;
+}

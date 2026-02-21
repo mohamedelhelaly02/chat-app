@@ -46,20 +46,6 @@ export class AuthService {
   isAuthenticated = computed(() => !!this.currentUser() && !!this.token());
   userName = computed(() => this.currentUser()?.username ?? 'Guest');
 
-  constructor() {
-    this.loadFromStorage();
-  }
-
-  private loadFromStorage() {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-
-    if (storedUser && storedToken) {
-      this.currentUser.set(JSON.parse(storedUser));
-      this.token.set(storedToken);
-    }
-  }
-
   register(registerData: RegisterData): Observable<any> {
     return this.httpClient
       .post<any>(`${this.BASE_URL}/register`, registerData, {

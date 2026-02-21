@@ -121,7 +121,11 @@ const refreshToken = asyncHandler(async (req, res, next) => {
 
   if (payload === null) {
     return next(
-      appError.create("Unauthorized", 401, httpStatusText.UNAUTHORIZED),
+      appError.create(
+        "Invalid or expired refresh token",
+        401,
+        httpStatusText.UNAUTHORIZED,
+      ),
     );
   }
 
@@ -130,6 +134,7 @@ const refreshToken = asyncHandler(async (req, res, next) => {
   const existedSession = await RefreshToken.findOne({
     userId: payload.sub,
     refreshTokenHash: hashedRefreshToken,
+    expiresAt: { $gt: new Date() },
   });
 
   if (!existedSession) {

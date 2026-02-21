@@ -1,29 +1,27 @@
 @if (message()) {
-<div class="message-wrapper" [class.mine]="isMine()">
+  <div class="message-wrapper" [class.mine]="isMine()">
     <div class="message-bubble">
+      <div class="message-content">
+        {{ message().content }}
+      </div>
 
-        <div class="message-content">
-            {{ message().content }}
-        </div>
+      <div class="message-meta">
+        <span class="time">
+          {{ message().createdAt | date: 'shortTime' }}
+        </span>
 
-        <div class="message-meta">
-            <span class="time">
-                {{ message().createdAt }}
-            </span>
-
-            @if (isMine()) {
-            <span class="status">
-                @if (message().read) {
-                ✔✔
-                } @else if (message().delivered) {
-                ✔✔
-                } @else {
-                ✔
-                }
-            </span>
+        @if (isMine()) {
+          <span class="status" [class.read]="message().read">
+            @if (message().read) {
+              <span class="double-check read-blue">✔✔</span>
+            } @else if (message().delivered) {
+              <span class="double-check">✔✔</span>
+            } @else {
+              <span class="single-check">✔</span>
             }
-        </div>
-
+          </span>
+        }
+      </div>
     </div>
-</div>
+  </div>
 }
