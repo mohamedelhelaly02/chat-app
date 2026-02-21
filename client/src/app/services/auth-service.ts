@@ -78,7 +78,7 @@ export class AuthService {
 
   logout(): Observable<LogoutResponse> {
     return this.httpClient
-      .post<LogoutResponse>(`${this.BASE_URL}/logout`, null)
+      .post<LogoutResponse>(`${this.BASE_URL}/logout`, null, { withCredentials: true })
       .pipe(tap(() => this.router.navigate(['/login'])));
   }
 

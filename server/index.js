@@ -57,7 +57,6 @@ app.use(globalErrorHandler);
 io.use((socket, next) => {
   try {
     const accessToken = socket.handshake.auth.token;
-    console.log(accessToken);
     if (!accessToken) {
       return next(
         appError.create(

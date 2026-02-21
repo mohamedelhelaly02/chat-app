@@ -12,7 +12,7 @@ const authMiddleware = async (req, res, next) => {
     try {
         const decoded = verifyJwtToken(token);
         if (decoded === null) {
-            return res.status(403).json({ status: 'fail', message: 'Invalid or expired token' });
+            return res.status(401).json({ status: 'fail', message: 'Invalid or expired token' });
         }
 
         req.userId = decoded.id;

@@ -9,7 +9,7 @@ const generateAccessToken = (user) => {
   };
 
   const options = {
-    expiresIn: "15m",
+    expiresIn: "1m",
     issuer: "chatapp",
     audience: "chatapp",
     algorithm: "HS256",

@@ -11,6 +11,12 @@ const httpStatusText = require("../utils/httpStatusText");
 const appError = require("../utils/appError");
 const { RefreshToken } = require("../models/refreshToken.model");
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: false,
+  sameSite: "Lax",
+};
+
 const register = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
 
@@ -66,11 +72,7 @@ const login = asyncHandler(async (req, res, next) => {
   });
 
   return res
-    .cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    })
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .status(200)
     .json({
       status: "success",
@@ -123,16 +125,18 @@ const refreshToken = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const existedSession = await RefreshToken.findOne({ userId: payload.sub });
+  const hashedRefreshToken = hashToken(refreshToken);
+
+  const existedSession = await RefreshToken.findOne({
+    userId: payload.sub,
+    refreshTokenHash: hashedRefreshToken,
+  });
 
   if (!existedSession) {
     return next(appError.create("Forbid", 403, httpStatusText.FORBIDDEN));
   }
 
-  const hashedRefreshToken = hashToken(refreshToken);
-
   if (hashedRefreshToken !== existedSession.refreshTokenHash) {
-    await RefreshToken.deleteMany({ userId: payload.sub });
     return next(appError.create("Forbid", 403, httpStatusText.FORBIDDEN));
   }
 
@@ -151,11 +155,7 @@ const refreshToken = asyncHandler(async (req, res, next) => {
   await existedSession.save();
 
   return res
-    .cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    })
+    .cookie("refreshToken", newRefreshToken, cookieOptions)
     .json({ accessToken: newAccessToken });
 });
 
