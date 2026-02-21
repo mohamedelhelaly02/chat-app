@@ -1,11 +1,29 @@
 @if (message()) {
-<div class="message">
-    <div class="message-header">
-        <span class="sender-name">{{ message().sender.username }}</span>
-        <span class="timestamp">{{ message().createdAt }}</span>
-    </div>
-    <div class="message-content">
-        {{ message().content }}
+<div class="message-wrapper" [class.mine]="isMine()">
+    <div class="message-bubble">
+
+        <div class="message-content">
+            {{ message().content }}
+        </div>
+
+        <div class="message-meta">
+            <span class="time">
+                {{ message().createdAt }}
+            </span>
+
+            @if (isMine()) {
+            <span class="status">
+                @if (message().read) {
+                ✔✔
+                } @else if (message().delivered) {
+                ✔✔
+                } @else {
+                ✔
+                }
+            </span>
+            }
+        </div>
+
     </div>
 </div>
 }

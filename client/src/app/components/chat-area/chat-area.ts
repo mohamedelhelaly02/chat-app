@@ -24,7 +24,4 @@ export class ChatArea {
     return this.chatService.chats().find(chat => chat._id === this.chatService.selectedChatId())?.participants[0]._id || '';
   }
 
-  onMessageSent($event: Event) {
-    throw new Error('Method not implemented.');
-  }
 }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChangeAvatarResponse, UserProfileResponse, UserService } from '../../services/user-service';
 import { User } from '../../models/user.model';
-import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-profile',

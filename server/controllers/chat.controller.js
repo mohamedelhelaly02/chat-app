@@ -1,66 +1,78 @@
-const asyncHandler = require('../utils/asyncHandler');
-const { User } = require('../models/user.model');
-const { Chat } = require('../models/chat.model');
-const appError = require('../utils/appError');
-const httpStatusText = require('../utils/httpStatusText');
+const asyncHandler = require("../utils/asyncHandler");
+const { User } = require("../models/user.model");
+const { Chat } = require("../models/chat.model");
+const appError = require("../utils/appError");
+const httpStatusText = require("../utils/httpStatusText");
 
 const getOrCreateChat = asyncHandler(async (req, res, next) => {
-    const { userId } = req.body;
-    const chatWithUser = await User.findById(userId);
+  const { userId } = req.body;
+  const chatWithUser = await User.findById(userId);
 
-    if (!chatWithUser) {
-        return next(appError.create('Chat participant not found', 400, httpStatusText.FAIL));
-    }
+  if (!chatWithUser) {
+    return next(
+      appError.create("Chat participant not found", 400, httpStatusText.FAIL),
+    );
+  }
 
-    const chat = await Chat.getOrCreateChat(req.userId, userId);
-    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chat } });
+  const chat = await Chat.getOrCreateChat(req.userId, userId);
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { chat } });
 });
 
 const getAllChats = asyncHandler(async (req, res, next) => {
-    const chats = await Chat.find({
-        participants: req.userId
-    })
-        .populate('participants', 'username email avatar online lastSeen')
-        .populate({
-            path: 'lastMessage',
-            populate: {
-                path: 'sender',
-                select: 'username avatar'
-            }
-        });
-
-    const chatsWithUnread = chats.map(chat => {
-        const chatObj = chat.toObject();
-
-        chatObj.participants = chatObj.participants.filter(p => p._id.toString() !== req.userId.toString());
-
-        chatObj.unreadCount = chat.unreadCount.get(req.userId.toString()) || 0;
-        return chatObj;
+  const chats = await Chat.find({
+    participants: req.userId,
+  })
+    .populate("participants", "username email avatar online lastSeen")
+    .populate({
+      path: "lastMessage",
+      populate: {
+        path: "sender",
+        select: "username avatar",
+      },
     });
 
-    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chats: chatsWithUnread } });
+  const chatsWithUnread = chats.map((chat) => {
+    const chatObj = chat.toObject();
+
+    chatObj.participants = chatObj.participants.filter(
+      (p) => p._id.toString() !== req.userId.toString(),
+    );
+
+    chatObj.unreadCount = chat.unreadCount.get(req.userId.toString()) || 0;
+    return chatObj;
+  });
+
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { chats: chatsWithUnread } });
 });
 
 const getChatById = asyncHandler(async (req, res, next) => {
-    const { chatId } = req.params;
-    const chat = await Chat.findById(chatId)
-        .populate('participants', '_id username email avatar online lastSeen')
-        .populate({
-            path: 'lastMessage',
-            populate: {
-                path: 'sender',
-                select: 'username avatar'
-            }
-        });
+  const { chatId } = req.params;
+  const chat = await Chat.findById(chatId)
+    .populate("participants", "_id username email avatar online lastSeen")
+    .populate({
+      path: "lastMessage",
+      populate: {
+        path: "sender",
+        select: "username avatar",
+      },
+    });
 
-    if (!chat) {
-        return next(appError.create('Chat not found', 404, httpStatusText.FAIL));
-    }
+  if (!chat) {
+    return next(appError.create("Chat not found", 404, httpStatusText.FAIL));
+  }
 
-    const chatObj = chat.toObject();
-    chatObj.participants = chatObj.participants.filter(p => p._id.toString() !== req.userId.toString());
+  const chatObj = chat.toObject();
+  chatObj.participants = chatObj.participants.filter(
+    (p) => p._id.toString() !== req.userId.toString(),
+  );
 
-    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { chat: chatObj } });
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { chat: chatObj } });
 });
 
 module.exports = { getOrCreateChat, getAllChats, getChatById };

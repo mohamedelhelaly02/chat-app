@@ -1,5 +1,6 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Message } from '../../models/message.model';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-user-message',
@@ -9,4 +10,12 @@ import { Message } from '../../models/message.model';
 })
 export class UserMessage {
   readonly message = input.required<Message>();
+  private readonly authService: AuthService = inject(AuthService);
+  private readonly currentUserId = this.authService.currentUser()?._id;
+
+
+  isMine() {
+    return this.message().sender._id === this.currentUserId;
+  }
+
 }
