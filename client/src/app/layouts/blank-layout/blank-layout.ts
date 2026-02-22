@@ -19,17 +19,6 @@ export class BlankLayout implements OnInit {
 
   ngOnInit(): void {
     this.socketService
-      .on('user:read_messsages_success')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data: any) => {
-        this.toastMessage.set({
-          message: data.message,
-          type: 'success',
-          duration: 3000,
-        });
-      });
-
-    this.socketService
       .on('user:online')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {

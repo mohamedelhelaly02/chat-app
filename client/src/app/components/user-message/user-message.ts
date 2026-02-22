@@ -18,6 +18,7 @@ export class UserMessage implements OnInit {
 
   ngOnInit(): void {
     this.chatService.listenToReadEvents();
+    this.chatService.listenToDeliveredMessageEvent();
   }
 
   isMine() {

@@ -1,92 +1,134 @@
-const asyncHandler = require('../utils/asyncHandler');
-const { Message } = require('../models/message.model');
-const { Chat } = require('../models/chat.model');
-const appError = require('../utils/appError');
-const httpStatusText = require('../utils/httpStatusText');
+const asyncHandler = require("../utils/asyncHandler");
+const { Message } = require("../models/message.model");
+const { Chat } = require("../models/chat.model");
+const appError = require("../utils/appError");
+const httpStatusText = require("../utils/httpStatusText");
+const { User } = require("../models/user.model");
 
 const getAllMessages = asyncHandler(async (req, res, next) => {
-    const { chatId } = req.params;
+  const { chatId } = req.params;
 
-    const chat = await Chat.findById(chatId);
-    if (!chat) {
-        return next(appError.create('Chat not found', 404, httpStatusText.FAIL));
-    }
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    return next(appError.create("Chat not found", 404, httpStatusText.FAIL));
+  }
 
-    const isParticipant = chat.participants.some(p => p.toString() === req.userId.toString());
-    if (!isParticipant) {
-        return next(appError.create('Access forbidden', 403, httpStatusText.FORBIDDEN));
-    }
+  const isParticipant = chat.participants.some(
+    (p) => p.toString() === req.userId.toString(),
+  );
+  if (!isParticipant) {
+    return next(
+      appError.create("Access forbidden", 403, httpStatusText.FORBIDDEN),
+    );
+  }
 
-    const messages = await Message.find({ chat: chatId, deleted: false })
-        .populate('sender', 'username avatar')
-        .populate('receiver', 'username avatar')
-        .sort({ createdAt: 1 });
+  const messages = await Message.find({ chat: chatId, deleted: false })
+    .populate("sender", "username avatar")
+    .populate("receiver", "username avatar")
+    .sort({ createdAt: 1 });
 
-    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { messages } });
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { messages } });
 });
 
 const createTextMessage = asyncHandler(async (req, res, next) => {
-    const { chatId } = req.params;
-    const { content } = req.body;
+  const { chatId } = req.params;
+  const { content } = req.body;
 
-    if (!content || content.trim() === '') {
-        return next(appError.create('Message content is required', 400, httpStatusText.FAIL));
+  if (!content || content.trim() === "") {
+    return next(
+      appError.create("Message content is required", 400, httpStatusText.FAIL),
+    );
+  }
+
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    return next(appError.create("Chat not found", 404, httpStatusText.FAIL));
+  }
+
+  const isParticipant = chat.participants.some(
+    (p) => p.toString() === req.userId.toString(),
+  );
+  if (!isParticipant) {
+    return next(
+      appError.create("Access forbidden", 403, httpStatusText.FORBIDDEN),
+    );
+  }
+
+  const receiver = chat.participants.find(
+    (p) => p.toString() !== req.userId.toString(),
+  );
+
+  const message = new Message({
+    sender: req.userId,
+    receiver: receiver,
+    chat: chatId,
+    messageType: "text",
+    content: content.trim(),
+  });
+
+  await message.save();
+  await message.populate("sender", "username avatar");
+  await message.populate("receiver", "username avatar");
+
+  chat.lastMessage = message._id;
+  chat.updatedAt = new Date();
+
+  if (receiver) {
+    const currentUnreadMessagesCount =
+      chat.unreadCount.get(receiver.toString()) || 0;
+    chat.unreadCount.set(receiver.toString(), currentUnreadMessagesCount + 1);
+
+    const user = await User.findById(receiver.toString());
+
+    if (user.online) {
+      message.delivered = true;
+      message.deliveredAt = new Date();
+      await message.save();
+
+      req.io
+        .to(req.userId)
+        .emit("user:message_delivered", {
+          chatId: chat._id.toString(),
+          messageId: message._id.toString(),
+        });
     }
+  }
 
-    const chat = await Chat.findById(chatId);
-    if (!chat) {
-        return next(appError.create('Chat not found', 404, httpStatusText.FAIL));
-    }
+  await chat.save();
 
-    const isParticipant = chat.participants.some(p => p.toString() === req.userId.toString());
-    if (!isParticipant) {
-        return next(appError.create('Access forbidden', 403, httpStatusText.FORBIDDEN));
-    }
-
-    const receiver = chat.participants.find(p => p.toString() !== req.userId.toString());
-
-    const message = new Message({
-        sender: req.userId,
-        receiver: receiver,
-        chat: chatId,
-        messageType: 'text',
-        content: content.trim()
-    });
-
-    await message.save();
-    await message.populate('sender', 'username avatar');
-    await message.populate('receiver', 'username avatar');
-
-    chat.lastMessage = message._id;
-    chat.updatedAt = new Date();
-
-    if (receiver) {
-        const currentUnreadMessagesCount = chat.unreadCount.get(receiver.toString()) || 0;
-        chat.unreadCount.set(receiver.toString(), currentUnreadMessagesCount + 1);
-    }
-
-    await chat.save();
-
-    return res.status(201).json({ status: httpStatusText.SUCCESS, data: { message } });
+  return res
+    .status(201)
+    .json({ status: httpStatusText.SUCCESS, data: { message } });
 });
 
 const deleteMessage = asyncHandler(async (req, res, next) => {
-    const { messageId } = req.params;
+  const { messageId } = req.params;
 
-    const message = await Message.findById(messageId);
-    if (!message) {
-        return next(appError.create('Message not found', 404, httpStatusText.FAIL));
-    }
+  const message = await Message.findById(messageId);
+  if (!message) {
+    return next(appError.create("Message not found", 404, httpStatusText.FAIL));
+  }
 
-    if (message.sender.toString() !== req.userId.toString()) {
-        return next(appError.create('You can only delete your own messages', 403, httpStatusText.FORBIDDEN));
-    }
+  if (message.sender.toString() !== req.userId.toString()) {
+    return next(
+      appError.create(
+        "You can only delete your own messages",
+        403,
+        httpStatusText.FORBIDDEN,
+      ),
+    );
+  }
 
-    message.deleted = true;
-    message.deletedAt = new Date();
-    await message.save();
+  message.deleted = true;
+  message.deletedAt = new Date();
+  await message.save();
 
-    return res.status(200).json({ status: httpStatusText.SUCCESS, message: 'Message deleted successfully' });
+  return res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    message: "Message deleted successfully",
+  });
 });
 
 module.exports = { getAllMessages, createTextMessage, deleteMessage };

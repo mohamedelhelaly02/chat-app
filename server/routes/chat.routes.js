@@ -1,42 +1,38 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getOrCreateChat, getAllChats, getChatById } = require('../controllers/chat.controller');
-const { getAllMessages, createTextMessage, deleteMessage } = require('../controllers/messages.controller');
-const authMiddleware = require('../middlewares/authMiddleware');
-const { getOrCreateChatValidator } = require('../validators/chatValidationSchema');
-const { validateMiddleware } = require('../middlewares/validateMiddleware');
+const {
+  getOrCreateChat,
+  getAllChats,
+  getChatById,
+} = require("../controllers/chat.controller");
+const {
+  getAllMessages,
+  createTextMessage,
+  deleteMessage,
+} = require("../controllers/messages.controller");
+const authMiddleware = require("../middlewares/authMiddleware");
+const {
+  getOrCreateChatValidator,
+} = require("../validators/chatValidationSchema");
+const { validateMiddleware } = require("../middlewares/validateMiddleware");
 
-router.route('')
-    .post(
-        authMiddleware,
-        getOrCreateChatValidator(),
-        validateMiddleware,
-        getOrCreateChat
-    )
-    .get(
-        authMiddleware,
-        getAllChats
-    );
-
-router.get('/:chatId',
+router
+  .route("")
+  .post(
     authMiddleware,
-    getChatById
-);
+    getOrCreateChatValidator(),
+    validateMiddleware,
+    getOrCreateChat,
+  )
+  .get(authMiddleware, getAllChats);
 
-router.get('/:chatId/messages',
-    authMiddleware,
-    getAllMessages
-);
+router.get("/:chatId", authMiddleware, getChatById);
 
-router.post('/:chatId/messages',
-    authMiddleware,
-    createTextMessage
-);
+router.get("/:chatId/messages", authMiddleware, getAllMessages);
 
-router.delete('/messages/:messageId',
-    authMiddleware,
-    deleteMessage
-);
+router.post("/:chatId/messages", authMiddleware, createTextMessage);
+
+router.delete("/messages/:messageId", authMiddleware, deleteMessage);
 
 module.exports = { chatRouter: router };
 

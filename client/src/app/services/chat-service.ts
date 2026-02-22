@@ -1,10 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { AuthService } from './auth-service';
 import { Chat } from '../models/chat.model';
 import { Message } from '../models/message.model';
 import { SocketService } from './socket-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ChatDataResponse {
   chat: Chat;
@@ -53,6 +54,7 @@ export class ChatService {
   private readonly httpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly socketService = inject(SocketService);
+  private readonly destroyRef = inject(DestroyRef);
 
   chats: WritableSignal<Chat[]> = signal<Chat[]>([]);
   messages: WritableSignal<Message[]> = signal<Message[]>([]);
@@ -64,21 +66,37 @@ export class ChatService {
   typingUsers: WritableSignal<Set<string>> = signal<Set<string>>(new Set());
 
   listenToReadEvents() {
-    this.socketService.on('user:messages_read').subscribe((data: any) => {
-      if (data.chatId !== this.selectedChatId()) return;
+    this.socketService
+      .on('user:messages_read')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (data.chatId !== this.selectedChatId()) return;
 
-      this.messages.update((allMessages) =>
-        allMessages.map((message) =>
-          data.readIds.includes(message._id) ? { ...message, read: true } : message,
-        ),
-      );
+        this.messages.update((allMessages) =>
+          allMessages.map((message) =>
+            data.readIds.includes(message._id) ? { ...message, read: true } : message,
+          ),
+        );
 
-      this.socketService.emit('user:seen_messages', {
-        chatWithUserId: data.chatWithUserId,
-        readBy: data.readBy,
+        this.socketService.emit('user:seen_messages', {
+          chatWithUserId: data.chatWithUserId,
+          readBy: data.readBy,
+        });
       });
-      
-    });
+  }
+
+  listenToDeliveredMessageEvent(): void {
+    this.socketService
+      .on('user:message_delivered')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (this.selectedChatId() !== data.chatId) return;
+        this.messages.update((allMessages) =>
+          allMessages.map((message) =>
+            message._id === data.messageId ? { ...message, delivered: true } : message,
+          ),
+        );
+      });
   }
 
   setTyping(fromUserId: string, isTyping: boolean) {

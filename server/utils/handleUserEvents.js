@@ -4,13 +4,6 @@ const { Message } = require("../models/message.model");
 
 const handleUserEvents = (io, socket) => {
   socket.on("user:login", async ({ userId }) => {
-    // update the user's online status in the database
-    // emit an event to all clients to update the online users list
-
-    console.log(`User with socket id: ${socket.id} logged in`);
-
-    console.log(`User with id: ${userId} logged in`);
-
     const user = await User.findById(userId);
 
     if (!user) {
@@ -23,6 +16,35 @@ const handleUserEvents = (io, socket) => {
       online: true,
       username: user.username,
     });
+
+    try {
+      const undeliveredMessages = await Message.find({
+        receiver: userId,
+        delivered: false,
+      });
+
+      if (undeliveredMessages.length > 0) {
+        const messageIds = undeliveredMessages.map((m) => m._id.toString());
+
+        await Message.updateMany(
+          { _id: { $in: messageIds } },
+          { $set: { delivered: true, deliveredAt: new Date() } },
+        );
+
+        undeliveredMessages.forEach((msg) => {
+          io.to(msg.sender.toString()).emit("user:message_delivered", {
+            chatId: msg.chat.toString(),
+            messageId: msg._id.toString(),
+          });
+        });
+
+        console.log(
+          `Updated ${undeliveredMessages.length} messages to delivered for user ${userId}`,
+        );
+      }
+    } catch (error) {
+      console.error("Error processing offline messages:", error);
+    }
   });
 
   socket.on("user:logout", async ({ userId }) => {
