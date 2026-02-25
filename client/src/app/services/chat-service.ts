@@ -65,6 +65,17 @@ export class ChatService {
   selectedChatId: WritableSignal<string> = signal<string>('');
   typingUsers: WritableSignal<Set<string>> = signal<Set<string>>(new Set());
 
+  resetChatState(): void {
+    this.chats.set([]);
+    this.messages.set([]);
+    this.isLoadingChats.set(false);
+    this.isLoadingMessages.set(false);
+    this.chatsError.set(null);
+    this.messagesError.set(null);
+    this.selectedChatId.set('');
+    this.typingUsers.set(new Set<string>());
+  }
+
   listenToReadEvents() {
     this.socketService
       .on('user:messages_read')

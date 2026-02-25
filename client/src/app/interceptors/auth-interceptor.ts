@@ -4,9 +4,11 @@ import { AuthService } from '../services/auth-service';
 import { SocketService } from '../services/socket-service';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { ChatService } from '../services/chat-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const chatService = inject(ChatService);
   const socketService = inject(SocketService);
   const router = inject(Router);
 
@@ -28,7 +30,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
         if (req.url.includes('/refresh')) {
-          handleLogout(authService, socketService, router);
+          handleLogout(authService, chatService, socketService, router);
           return throwError(() => error);
         }
 
@@ -47,7 +49,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             return next(retryRequest);
           }),
           catchError((refreshError) => {
-            handleLogout(authService, socketService, router);
+            handleLogout(authService, chatService, socketService, router);
             return throwError(() => refreshError);
           }),
         );
@@ -57,11 +59,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
-function handleLogout(authService: any, socketService: any, router: any) {
+function handleLogout(authService: any, chatService: any, socketService: any, router: any) {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  authService.currentUser.set(null);
-  authService.token.set(null);
+  authService.resetAuthState();
+  chatService.resetChatState();
   socketService.disconnect();
   router.navigate(['/login']);
 }

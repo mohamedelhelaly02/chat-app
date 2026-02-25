@@ -7,6 +7,7 @@ const http = require("http");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const { User } = require("./models/user.model");
 
 const { authRouter } = require("./routes/auth.routes");
 const { chatRouter } = require("./routes/chat.routes");
@@ -87,15 +88,38 @@ io.use((socket, next) => {
   }
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log(`User connected: ${socket.user.id}`);
 
-  socket.join(socket.user.id);
+  const userId = socket.user.id;
+
+  socket.join(userId);
+
+  const user = await User.findById(userId);
+
+  await User.findByIdAndUpdate(userId, { online: true });
+
+  socket.broadcast.emit("user:statusChanged", {
+    userId: userId,
+    online: true,
+    username: user.username,
+  });
 
   handleUserEvents(io, socket);
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     console.log(`User disconnected: ${socket.id}`);
+
+    await User.findByIdAndUpdate(userId, {
+      online: false,
+      lastSeen: new Date(),
+    });
+
+    socket.broadcast.emit("user:statusChanged", {
+      userId: userId,
+      online: false,
+      username: user.username,
+    });
   });
 });
 

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { User } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth-service';
 import { SocketService } from '../../../services/socket-service';
+import { ChatService } from '../../../services/chat-service';
 
 @Component({
   selector: 'app-navbar-user-menu',
@@ -14,6 +15,7 @@ import { SocketService } from '../../../services/socket-service';
 })
 export class NavbarUserMenu {
   authService = inject(AuthService);
+  chatService = inject(ChatService);
   user = input.required<User | null>();
   showDropdown = signal(false);
   private readonly socketService = inject(SocketService);
@@ -37,8 +39,8 @@ export class NavbarUserMenu {
       localStorage.removeItem('user');
       localStorage.removeItem('token');
 
-      this.authService.currentUser.set(null);
-      this.authService.token.set(null);
+      this.authService.resetAuthState();
+      this.chatService.resetChatState();
     });
   }
 }

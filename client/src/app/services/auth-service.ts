@@ -46,6 +46,11 @@ export class AuthService {
   isAuthenticated = computed(() => !!this.currentUser() && !!this.token());
   userName = computed(() => this.currentUser()?.username ?? 'Guest');
 
+  resetAuthState(): void {
+    this.currentUser.set(null);
+    this.token.set(null);
+  }
+
   register(registerData: RegisterData): Observable<any> {
     return this.httpClient
       .post<any>(`${this.BASE_URL}/register`, registerData, {
