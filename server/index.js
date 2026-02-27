@@ -7,7 +7,6 @@ const http = require("http");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const { User } = require("./models/user.model");
 
 const { authRouter } = require("./routes/auth.routes");
 const { chatRouter } = require("./routes/chat.routes");
@@ -17,6 +16,8 @@ const { handleUserEvents } = require("./utils/handleUserEvents");
 const appError = require("./utils/appError");
 const httpStatusText = require("./utils/httpStatusText");
 const { verifyJwtToken } = require("./utils/jwt");
+const { User } = require("./models/user.model");
+
 
 const PORT = process.env.PORT || 4000;
 const app = express();

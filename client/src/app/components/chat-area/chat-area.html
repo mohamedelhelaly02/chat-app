@@ -1,52 +1,54 @@
 <div class="chat-area">
-    @if (!selectedChatMessages()) {
+  @if (!selectedChatMessages()) {
     <div class="empty-state">
-        <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-        </svg>
-        <h2>مرحباً بك! 👋</h2>
-        <p>اختر محادثة من القائمة للبدء</p>
+      <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+      </svg>
+      <h2>مرحباً بك! 👋</h2>
+      <p>اختر محادثة من القائمة للبدء</p>
     </div>
-    }
-
-    @else if (isLoadingMessages()) {
+  } @else if (isLoadingMessages()) {
     <div class="loading-state">
-        <div class="spinner"></div>
-        <p>جاري تحميل الرسائل...</p>
+      <div class="spinner"></div>
+      <p>جاري تحميل الرسائل...</p>
     </div>
-    }
-
-    @else if (messagesError()) {
+  } @else if (messagesError()) {
     <div class="error-state">
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
-            <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-        </svg>
-        <p class="error">حدث خطأ في تحميل الرسائل</p>
-        <p>{{ messagesError() }}</p>
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+        />
+      </svg>
+      <p class="error">حدث خطأ في تحميل الرسائل</p>
+      <p>{{ messagesError() }}</p>
     </div>
-    }
-    @else {
+  } @else {
     <div class="chat-header">
-        <img [src]="selectedUserChat()?.avatar" alt="Avatar">
-        <div>
-            <h3>{{ selectedUserChat()?.username }}</h3>
-            <span class="status">
-                {{ selectedUserChat()?.online ? 'متصل الآن' : 'غير متصل' }}
-            </span>
-        </div>
+      @if (selectedUserChat()?.avatar) {
+        <img [src]="selectedUserChat()?.avatar" alt="Avatar" />
+      } @else {
+        <div class="avatar-placeholder">{{ UsernameUpperedCase }}</div>
+      }
+      <div>
+        <h3>{{ selectedUserChat()?.username }}</h3>
+        <span class="status">
+          {{ selectedUserChat()?.online ? 'Online now ' : 'Offline' }}
+        </span>
+      </div>
     </div>
 
     <div class="messages-container">
-        <div class="messages-list">
-            @for (message of selectedChatMessages(); track message._id) {
-            <app-user-message [message]="message"></app-user-message>
-            }
-        </div>
+      <div class="messages-list">
+        @for (message of selectedChatMessages(); track message._id) {
+          <app-user-message [message]="message"></app-user-message>
+        }
+
+        @if (typingUsers().has(selectedUserId())) {
+          <app-typing-indicator></app-typing-indicator>
+        }
+      </div>
     </div>
 
-    <app-message-input [selectedUserId]="selectedUserId()">
-    </app-message-input>
-
-    }
+    <app-message-input [selectedUserId]="selectedUserId()"> </app-message-input>
+  }
 </div>

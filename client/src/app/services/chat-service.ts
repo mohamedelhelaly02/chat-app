@@ -1,7 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { DestroyRef, inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { AuthService } from './auth-service';
 import { Chat } from '../models/chat.model';
 import { Message } from '../models/message.model';
 import { SocketService } from './socket-service';
@@ -52,7 +51,6 @@ interface DeleteMessageResponse {
 export class ChatService {
   readonly BASE_URL: string = 'http://localhost:4000/api/v1/chats';
   private readonly httpClient = inject(HttpClient);
-  private readonly authService = inject(AuthService);
   private readonly socketService = inject(SocketService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -76,6 +74,26 @@ export class ChatService {
     this.typingUsers.set(new Set<string>());
   }
 
+  markChatAsReadLocally(chatId: string, userId: string): void {
+    this.chats.update((allChats) =>
+      allChats.map((chat) => {
+        if (chat._id === chatId) {
+          return { ...chat, unreadCount: 0 };
+        }
+        return chat;
+      }),
+    );
+  }
+
+  listenToUserLoadChatsEvent(): void {
+    this.socketService
+      .on('user:load_user_chats')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.loadChats();
+      });
+  }
+
   listenToReadEvents() {
     this.socketService
       .on('user:messages_read')
@@ -96,6 +114,53 @@ export class ChatService {
       });
   }
 
+  listenToOnlineUserEvent(): void {
+    this.socketService
+      .on('user:online')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.updateUserOnlineStatus(data.userId, data.online);
+      });
+  }
+
+  listenToUserStatusChangedEvent(): void {
+    this.socketService
+      .on('user:statusChanged')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.updateUserOnlineStatus(data.userId, data.online);
+      });
+  }
+
+  listenToUserTypingEvent(): void {
+    this.socketService
+      .on('user:typing')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.setTyping(data.userId, data.isTyping);
+      });
+  }
+
+  listenToChatUpdatedEvent(): void {
+    this.socketService
+      .on('chat:updated')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        const updatedChat = data.chat;
+        console.log('Updated Chat: ', updatedChat);
+        this.chats.update((chats) => {
+          const index = chats.findIndex((c) => c._id === updatedChat._id);
+
+          if (index !== -1) {
+            chats[index] = updatedChat;
+          } else {
+            chats.unshift(updatedChat);
+          }
+          return [...chats];
+        });
+      });
+  }
+
   listenToDeliveredMessageEvent(): void {
     this.socketService
       .on('user:message_delivered')
@@ -110,7 +175,7 @@ export class ChatService {
       });
   }
 
-  setTyping(fromUserId: string, isTyping: boolean) {
+  private setTyping(fromUserId: string, isTyping: boolean) {
     if (!fromUserId) {
       return;
     }
@@ -126,46 +191,37 @@ export class ChatService {
   }
 
   getOrCreateChat(userId: string): Observable<ChatResponse> {
-    return this.httpClient
-      .post<ChatResponse>(this.BASE_URL, { userId }, { headers: this.getAuthHeaders() })
-      .pipe(
-        tap((response) => {
-          const chat = response.data.chat;
-          this.chats.update((prev) => this.upsertChat(prev, chat));
-        }),
-      );
+    return this.httpClient.post<ChatResponse>(this.BASE_URL, { userId }).pipe(
+      tap((response) => {
+        const chat = response.data.chat;
+        this.chats.update((prev) => this.upsertChat(prev, chat));
+      }),
+    );
   }
 
   loadChats(): void {
     this.isLoadingChats.set(true);
     this.chatsError.set(null);
 
-    this.httpClient
-      .get<ChatsResponse>(this.BASE_URL, { headers: this.getAuthHeaders() })
-      .subscribe({
-        next: (response) => {
-          console.log('Chats loaded: ', response.data.chats);
-          this.chats.set(response.data.chats);
-          this.isLoadingChats.set(false);
-        },
-        error: () => {
-          this.chatsError.set('تعذر تحميل المحادثات.');
-          this.isLoadingChats.set(false);
-        },
-      });
+    this.httpClient.get<ChatsResponse>(this.BASE_URL).subscribe({
+      next: (response) => {
+        this.chats.set(response.data.chats);
+        this.isLoadingChats.set(false);
+      },
+      error: () => {
+        this.chatsError.set('تعذر تحميل المحادثات.');
+        this.isLoadingChats.set(false);
+      },
+    });
   }
 
   getMessages(chatId: string): Observable<MessagesResponse> {
     this.selectedChatId.set(chatId);
-    return this.httpClient
-      .get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`, {
-        headers: this.getAuthHeaders(),
-      })
-      .pipe(
-        tap((response) => {
-          this.messages.set(response.data.messages);
-        }),
-      );
+    return this.httpClient.get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`).pipe(
+      tap((response) => {
+        this.messages.set(response.data.messages);
+      }),
+    );
   }
 
   loadMessages(chatId: string): void {
@@ -185,11 +241,7 @@ export class ChatService {
 
   sendTextMessage(chatId: string, content: string): Observable<MessageResponse> {
     return this.httpClient
-      .post<MessageResponse>(
-        `${this.BASE_URL}/${chatId}/messages`,
-        { content },
-        { headers: this.getAuthHeaders() },
-      )
+      .post<MessageResponse>(`${this.BASE_URL}/${chatId}/messages`, { content })
       .pipe(
         tap((response) => {
           this.messages.update((prev) => [...prev, response.data.message]);
@@ -198,14 +250,7 @@ export class ChatService {
   }
 
   deleteMessage(messageId: string): Observable<DeleteMessageResponse> {
-    return this.httpClient.delete<DeleteMessageResponse>(`${this.BASE_URL}/messages/${messageId}`, {
-      headers: this.getAuthHeaders(),
-    });
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.token();
-    return new HttpHeaders().set('Authorization', `Bearer ${token ?? ''}`);
+    return this.httpClient.delete<DeleteMessageResponse>(`${this.BASE_URL}/messages/${messageId}`);
   }
 
   private upsertChat(existing: Chat[], incoming: Chat): Chat[] {
@@ -219,7 +264,7 @@ export class ChatService {
     return next;
   }
 
-  updateUserOnlineStatus(userId: string, online: boolean) {
+  private updateUserOnlineStatus(userId: string, online: boolean) {
     console.log(`Updating online status for user ${userId} to ${online}`);
     return this.chats.update((prev) => {
       return prev.map((chat) => {

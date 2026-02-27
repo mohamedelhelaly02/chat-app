@@ -27,7 +27,8 @@ export class SocketService {
       this.socket = io(this.socketUrl, {
         reconnection: true,
         autoConnect: true,
-        reconnectionDelay: 1000,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 2000,
         auth: {
           token: accessToken,
         },

@@ -1,46 +1,44 @@
 <div class="chats-list">
-    @if (isLoadingChats()) {
+  @if (isLoadingChats()) {
     <div class="loading">جاري التحميل...</div>
-    } @else if (chatsError()) {
+  } @else if (chatsError()) {
     <div class="error">{{ chatsError() }}</div>
-    } @else if (chats().length === 0) {
+  } @else if (chats().length === 0) {
     <div class="empty">لا توجد محادثات</div>
-    } @else {
+  } @else {
     @for (chat of chats(); track chat._id) {
-    <div class="chat-item" (click)="selectChat(chat._id)">
+      <div class="chat-item" (click)="selectChat(chat._id)">
         <div class="chat-header">
-            <div class="participant-info">
-                @let otherParticipant = chat.participants[0];
-                @if (otherParticipant) {
-                <div class="participant-avatar">
-                    @if (otherParticipant.avatar) {
-                    <img [src]="otherParticipant.avatar" [alt]="otherParticipant.username" />
-                    } @else {
-                    <div class="avatar-placeholder">{{ otherParticipant.username[0].toUpperCase() }}</div>
-                    }
-                    @if (otherParticipant.online) {
-                    <span class="online-indicator"></span>
-                    }
-                </div>
-                <div class="participant-details">
-                    <h4>{{ otherParticipant.username }}</h4>
-                    @if (typingUsers().has(otherParticipant._id)) {
-                    <p class="typing-indicator">
-                        <span class="typing-dot"></span>
-                        <span class="typing-dot"></span>
-                        <span class="typing-dot"></span>
-                    </p>
-                    } @else if (chat.lastMessage) {
-                    <p class="last-message">{{ chat.lastMessage.content }}</p>
-                    }
-                </div>
+          <div class="participant-info">
+            @let otherParticipant = chat.participants[0];
+            @if (otherParticipant) {
+              <div class="participant-avatar">
+                @if (otherParticipant.avatar) {
+                  <img [src]="otherParticipant.avatar" [alt]="otherParticipant.username" />
+                } @else {
+                  <div class="avatar-placeholder">
+                    {{ otherParticipant.username[0].toUpperCase() }}
+                  </div>
                 }
-            </div>
-            @if (chat.unreadCount && chat.unreadCount > 0) {
-            <span class="unread-badge">{{ chat.unreadCount }}</span>
+                @if (otherParticipant.online) {
+                  <span class="online-indicator"></span>
+                }
+              </div>
+              <div class="participant-details">
+                <h4>{{ otherParticipant.username }}</h4>
+                @if (typingUsers().has(otherParticipant._id)) {
+                  <app-typing-indicator></app-typing-indicator>
+                } @else if (chat.lastMessage) {
+                  <p class="last-message">{{ chat.lastMessage.content }}</p>
+                }
+              </div>
             }
+          </div>
+          @if (chat.unreadCount && chat.unreadCount > 0) {
+            <span class="unread-badge">{{ chat.unreadCount }}</span>
+          }
         </div>
-    </div>
+      </div>
     }
-    }
+  }
 </div>

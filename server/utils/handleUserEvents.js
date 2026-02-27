@@ -86,6 +86,8 @@ const handleUserEvents = (io, socket) => {
     try {
       if (!message) return;
 
+      console.log("New Message: ", message);
+
       const updatedChat = await Chat.findOne({ _id: message.chat })
         .populate("participants", "username email avatar online lastSeen")
         .populate({
@@ -111,6 +113,10 @@ const handleUserEvents = (io, socket) => {
         updatedChat.unreadCount.get(fromUserId.toString()) || 0;
 
       io.to(toUserId).emit("chat:updated", { chat: chatForReceiver });
+      io.to(toUserId).emit("chat:message-received", {
+        chatId: chatForReceiver._id.toString(),
+        message,
+      });
       io.to(fromUserId).emit("chat:updated", { chat: chatForSender });
     } catch (error) {
       console.error("Error emitting new message:", error);
@@ -156,6 +162,11 @@ const handleUserEvents = (io, socket) => {
       message: `${user.username} read your messages`,
     });
   });
+
+  socket.on('user:changed_avatar', ({ userId }) => {
+    console.log( `User with id ${userId} changed his profile avatar`);
+    socket.broadcast.emit('user:load_user_chats');
+  })
 };
 
 module.exports = { handleUserEvents };

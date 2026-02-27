@@ -2,38 +2,65 @@
   <div class="profile-card">
     <div class="profile-header">
       <div class="avatar-section">
-        <img [src]="profileData().avatar" alt="Profile Avatar" class="profile-avatar">
+        @if (profileData().avatar) {
+          <img [src]="profileData().avatar" alt="Profile Avatar" class="profile-avatar" />
+        } @else {
+          <div class="avatar-placeholder">{{ usernameUpperedCase() }}</div>
+        }
+
         @if (isEditing()) {
-        <div class="avatar-upload">
-          <input type="file" #avatarInput hidden accept="image/*" (change)="changeAvatar($event)">
-          <button class="upload-btn" (click)="avatarInput.click()" title="تغيير الصورة">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-              <circle cx="12" cy="13" r="4"></circle>
-            </svg>
-          </button>
-        </div>
+          <div class="avatar-upload">
+            <input
+              type="file"
+              #avatarInput
+              hidden
+              accept="image/*"
+              (change)="changeAvatar($event)"
+            />
+            <button class="upload-btn" (click)="avatarInput.click()" title="Change profile photo">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                ></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </button>
+          </div>
         }
       </div>
 
       <div class="header-info">
         @if (isEditing()) {
-        <h2 class="edit-label">تحرير الملف الشخصي</h2>
+          <h2 class="edit-label">Profile Edit</h2>
         } @else {
-        <h1 class="profile-title">{{ profileData().username }}</h1>
-        <p class="profile-subtitle">{{ profileData().email }}</p>
+          <h1 class="profile-title">{{ profileData().username }}</h1>
+          <p class="profile-subtitle">{{ profileData().email }}</p>
         }
       </div>
 
       <div class="header-actions">
         @if (!isEditing()) {
-        <button class="edit-btn" (click)="startEditing()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-          تعديل الملف الشخصي
-        </button>
+          <button class="edit-btn" (click)="startEditing()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Edit profile
+          </button>
         }
       </div>
     </div>
@@ -42,78 +69,103 @@
     <form [formGroup]="profileForm" class="profile-form">
       <!-- Username Field -->
       <div class="form-group">
-        <label for="username" class="form-label">اسم المستخدم</label>
+        <label for="username" class="form-label">Username</label>
         @if (isEditing()) {
-        <input id="username" type="text" formControlName="username" class="form-control"
-          [class.error]="profileForm.get('username')?.invalid && profileForm.get('username')?.touched">
-        @if (profileForm.get('username')?.invalid && profileForm.get('username')?.touched) {
-        <span class="error-message">{{ usernameError }}</span>
-        }
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            class="form-control"
+            [class.error]="
+              profileForm.get('username')?.invalid && profileForm.get('username')?.touched
+            "
+          />
+          @if (profileForm.get('username')?.invalid && profileForm.get('username')?.touched) {
+            <span class="error-message">{{ usernameError }}</span>
+          }
         } @else {
-        <p class="field-value">{{ profileData().username }}</p>
+          <p class="field-value">{{ profileData().username }}</p>
         }
       </div>
 
       <!-- Email Field -->
       <div class="form-group">
-        <label for="email" class="form-label">البريد الإلكتروني</label>
+        <label for="email" class="form-label">Email</label>
         @if (isEditing()) {
-        <input id="email" type="email" formControlName="email" class="form-control"
-          [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
-        @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
-        <span class="error-message">{{ emailError }}</span>
-        }
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-control"
+            [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+          />
+          @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+            <span class="error-message">{{ emailError }}</span>
+          }
         } @else {
-        <p class="field-value">{{ profileData().email }}</p>
+          <p class="field-value">{{ profileData().email }}</p>
         }
       </div>
 
       <!-- Bio Field -->
       <div class="form-group">
-        <label for="bio" class="form-label">النبذة الشخصية</label>
+        <label for="bio" class="form-label">Bio</label>
         @if (isEditing()) {
-        <textarea id="bio" formControlName="bio" class="form-control" rows="4"
-          placeholder="أخبر الآخرين عن نفسك"></textarea>
-        <span class="char-count">{{ profileForm.get('bio')?.value?.length || 0 }}/150</span>
+          <textarea
+            id="bio"
+            formControlName="bio"
+            class="form-control"
+            rows="4"
+            placeholder="أخبر الآخرين عن نفسك"
+          ></textarea>
+          <span class="char-count">{{ profileForm.get('bio')?.value?.length || 0 }}/150</span>
         } @else {
-        <p class="field-value">{{ profileData().bio }}</p>
+          <p class="field-value">{{ profileData().bio }}</p>
         }
       </div>
 
       <!-- Join Date -->
       <div class="form-group">
-        <label class="form-label">تاريخ الانضمام</label>
-        <p class="field-value">{{ profileData().createdAt | date:'dd/MM/yyyy' }}</p>
+        <label class="form-label">Join date</label>
+        <p class="field-value">{{ profileData().createdAt | date: 'dd/MM/yyyy' }}</p>
       </div>
 
       <!-- Action Buttons -->
       @if (isEditing()) {
-      <div class="form-actions">
-        <button type="button" class="btn btn-save" (click)="saveProfile()"
-          [disabled]="profileForm.invalid || isLoading()">
-          حفظ التغييرات
-        </button>
-        <button type="button" class="btn btn-cancel" (click)="cancelEditing()" [disabled]="isLoading()">
-          إلغاء
-        </button>
-      </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-save"
+            (click)="saveProfile()"
+            [disabled]="profileForm.invalid || isLoading()"
+          >
+            حفظ التغييرات
+          </button>
+          <button
+            type="button"
+            class="btn btn-cancel"
+            (click)="cancelEditing()"
+            [disabled]="isLoading()"
+          >
+            إلغاء
+          </button>
+        </div>
       }
     </form>
   </div>
 
-  <!-- Additional Info Section -->
   <div class="info-card">
-    <h3 class="card-title">معلومات إضافية</h3>
+    <h3 class="card-title">Additional information</h3>
     <div class="info-grid">
       <div class="info-item">
-        <span class="info-label">حالة الحساب</span>
+        <span class="info-label">Account status</span>
         <span class="info-value" [class.active]="profileData().online">
-          {{ profileData().online ? 'متصل' : 'غير متصل' }}
+          {{ profileData().online ? 'Online' : 'Offline' }}
         </span>
       </div>
       <div class="info-item">
-        <span class="info-label">آخر نشاط</span>
-        <span class="info-value">{{ profileData().lastSeen | date:'short' }}</span>
+        <span class="info-label">Last seen</span>
+        <span class="info-value">{{ profileData().lastSeen | date: 'short' }}</span>
       </div>
     </div>
   </div>

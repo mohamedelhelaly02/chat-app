@@ -15,13 +15,13 @@ interface UserData {
   user: User;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   status: string;
   token: string;
   data: UserData;
 }
 
-interface LoginCredentials {
+export interface LoginCredentials {
   email: string;
   password: string;
 }

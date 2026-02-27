@@ -12,7 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './message-input.css',
 })
 export class MessageInput {
-
   selectedUserId = input.required<string>();
   placeholderText = input<string>('Type a message...');
   private readonly socketService: SocketService = inject(SocketService);
@@ -23,38 +22,30 @@ export class MessageInput {
   typingTimeout: any;
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
-
   messageText: string = '';
 
   onKeyPress(event: KeyboardEvent) {
     if (!this.selectedUserId()) {
-      console.warn('No user selected, cannot send message');
       return;
     }
 
     if (event.key === 'Enter' && !event.shiftKey) {
-      console.log('Message sent:', this.messageText);
-      console.log('Selected User ID:', this.selectedUserId());
-      console.log('Chat ID:', this.chatId());
-      this.chatService.sendTextMessage(this.chatId(), this.messageText)
+      this.chatService
+        .sendTextMessage(this.chatId(), this.messageText)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
-            console.log('Message sent successfully:', response);
             this.messageText = '';
 
-            this.socketService.emit('user:new_message',
-              {
-                toUserId: this.selectedUserId(),
-                fromUserId: this.fromUserId,
-                message: response.data.message
-              });
-
-          }
+            this.socketService.emit('user:new_message', {
+              toUserId: this.selectedUserId(),
+              fromUserId: this.fromUserId,
+              message: response.data.message,
+            });
+          },
         });
     }
   }
-
 
   onInput() {
     if (!this.selectedUserId() || this.fromUserId === '') {
@@ -62,14 +53,20 @@ export class MessageInput {
       return;
     }
 
-    this.socketService.emit('user:typing', { toUserId: this.selectedUserId(), fromUserId: this.fromUserId, isTyping: true });
-
+    this.socketService.emit('user:typing', {
+      toUserId: this.selectedUserId(),
+      fromUserId: this.fromUserId,
+      isTyping: true,
+    });
 
     clearTimeout(this.typingTimeout);
 
     this.typingTimeout = setTimeout(() => {
-      this.socketService.emit('user:typing', { toUserId: this.selectedUserId(), fromUserId: this.fromUserId, isTyping: false });
+      this.socketService.emit('user:typing', {
+        toUserId: this.selectedUserId(),
+        fromUserId: this.fromUserId,
+        isTyping: false,
+      });
     }, 3000);
   }
-
 }

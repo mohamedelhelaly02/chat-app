@@ -20,6 +20,10 @@ export class NavbarUserMenu {
   showDropdown = signal(false);
   private readonly socketService = inject(SocketService);
 
+  get UsernameUpperedCase() {
+    return this.user()?.username[0].toUpperCase();
+  }
+
   toggleDropdown() {
     this.showDropdown.set(!this.showDropdown());
   }

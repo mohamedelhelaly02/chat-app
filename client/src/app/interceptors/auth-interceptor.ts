@@ -46,6 +46,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               withCredentials: true,
             });
 
+            socketService.connect(newAccessToken);
+
             return next(retryRequest);
           }),
           catchError((refreshError) => {
