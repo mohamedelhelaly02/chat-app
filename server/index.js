@@ -30,6 +30,8 @@ const io = socketIo(server, {
   },
 });
 
+mongoose.set('bufferCommands', false);
+
 mongoose
   .connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 5000
