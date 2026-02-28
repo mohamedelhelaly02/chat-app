@@ -13,7 +13,7 @@ const { RefreshToken } = require("../models/refreshToken.model");
 
 const cookieOptions = {
   httpOnly: true,
-  secure: false,
+  secure: process.env.NODE_ENV === 'production',
   sameSite: "Lax",
 };
 
@@ -164,15 +164,5 @@ const refreshToken = asyncHandler(async (req, res, next) => {
     .json({ accessToken: newAccessToken });
 });
 
-const updateFCMToken = asyncHandler(async (req, res, next) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).send();
 
-  await User.findByIdAndUpdate(req.userId, {
-    $addToSet: { fcmTokens: token },
-  });
-
-  res.status(200).json({ status: "success" });
-});
-
-module.exports = { register, login, logout, refreshToken, updateFCMToken };
+module.exports = { register, login, logout, refreshToken };
