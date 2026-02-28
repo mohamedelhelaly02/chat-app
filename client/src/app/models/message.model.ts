@@ -1,9 +1,7 @@
-import { User } from './user.model';
-
 export interface Message {
   _id: string;
-  sender: User;
-  receiver: User;
+  sender: string;
+  receiver: string;
   chat: string;
   messageType: 'text' | 'voice';
   content?: string;

@@ -35,7 +35,7 @@ interface LogoutResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  readonly BASE_URL: string = 'https://chat-app-black-ten-76.vercel.app/api/v1/auth';
+  readonly BASE_URL: string = 'http://localhost:4000/api/v1/auth';
   readonly httpClient = inject(HttpClient);
   readonly router = inject(Router);
   private readonly socketService: SocketService = inject(SocketService);

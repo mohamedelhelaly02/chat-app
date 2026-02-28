@@ -30,6 +30,7 @@ export class MessageInput {
     }
 
     if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
       this.chatService
         .sendTextMessage(this.chatId(), this.messageText)
         .pipe(takeUntilDestroyed(this.destroyRef))

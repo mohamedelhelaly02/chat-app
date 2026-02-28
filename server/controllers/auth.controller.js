@@ -14,7 +14,7 @@ const { RefreshToken } = require("../models/refreshToken.model");
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
+  sameSite: "Lax",
 };
 
 const register = asyncHandler(async (req, res, next) => {

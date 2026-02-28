@@ -23,8 +23,6 @@ const getAllMessages = asyncHandler(async (req, res, next) => {
   }
 
   const messages = await Message.find({ chat: chatId, deleted: false })
-    .populate("sender", "username avatar")
-    .populate("receiver", "username avatar")
     .sort({ createdAt: 1 });
 
   return res

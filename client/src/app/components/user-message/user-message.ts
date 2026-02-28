@@ -22,6 +22,6 @@ export class UserMessage implements OnInit {
   }
 
   isMine() {
-    return this.message().sender._id === this.currentUserId;
+    return this.message().sender === this.currentUserId;
   }
 }

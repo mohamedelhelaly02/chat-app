@@ -31,7 +31,7 @@ export type ChangeAvatarResponse = {
   providedIn: 'root',
 })
 export class UserService {
-  BASE_URL: string = 'https://chat-app-black-ten-76.vercel.app/api/v1/users';
+  BASE_URL: string = 'http://localhost:4000/api/v1/users';
   private readonly httpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
 

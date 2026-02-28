@@ -49,7 +49,7 @@ interface DeleteMessageResponse {
   providedIn: 'root',
 })
 export class ChatService {
-  readonly BASE_URL: string = 'https://chat-app-black-ten-76.vercel.app/api/v1/chats';
+  readonly BASE_URL: string = 'http://localhost:4000/api/v1/chats';
   private readonly httpClient = inject(HttpClient);
   private readonly socketService = inject(SocketService);
   private readonly destroyRef = inject(DestroyRef);
@@ -214,6 +214,7 @@ export class ChatService {
     this.selectedChatId.set(chatId);
     return this.httpClient.get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`).pipe(
       tap((response) => {
+        console.log("Loaded messages in service: ", response.data.messages);
         this.messages.set(response.data.messages);
       }),
     );
