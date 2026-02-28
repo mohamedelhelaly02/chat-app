@@ -7,7 +7,7 @@ import { io, Socket } from 'socket.io-client';
 })
 export class SocketService {
   private socket!: Socket;
-  private readonly socketUrl = 'http://localhost:4000';
+  private readonly socketUrl = 'https://chat-app-black-ten-76.vercel.app';
   isConnected: WritableSignal<boolean> = signal<boolean>(false);
   connectionError: WritableSignal<string | null> = signal<string | null>(null);
 
