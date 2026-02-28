@@ -25,6 +25,7 @@ export class SocketService {
       }
 
       this.socket = io(this.socketUrl, {
+        transports: ['polling'],
         reconnection: true,
         autoConnect: true,
         reconnectionAttempts: 5,
