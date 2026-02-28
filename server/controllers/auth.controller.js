@@ -164,4 +164,15 @@ const refreshToken = asyncHandler(async (req, res, next) => {
     .json({ accessToken: newAccessToken });
 });
 
-module.exports = { register, login, logout, refreshToken };
+const updateFCMToken = asyncHandler(async (req, res, next) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).send();
+
+  await User.findByIdAndUpdate(req.userId, {
+    $addToSet: { fcmTokens: token },
+  });
+
+  res.status(200).json({ status: "success" });
+});
+
+module.exports = { register, login, logout, refreshToken, updateFCMToken };

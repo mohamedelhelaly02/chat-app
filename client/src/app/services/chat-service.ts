@@ -191,12 +191,7 @@ export class ChatService {
   }
 
   getOrCreateChat(userId: string): Observable<ChatResponse> {
-    return this.httpClient.post<ChatResponse>(this.BASE_URL, { userId }).pipe(
-      tap((response) => {
-        const chat = response.data.chat;
-        this.chats.update((prev) => this.upsertChat(prev, chat));
-      }),
-    );
+    return this.httpClient.post<ChatResponse>(this.BASE_URL, { userId });
   }
 
   loadChats(): void {

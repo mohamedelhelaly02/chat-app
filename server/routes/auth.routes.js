@@ -5,6 +5,7 @@ const {
   login,
   logout,
   refreshToken,
+  updateFCMToken,
 } = require("../controllers/auth.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { validateMiddleware } = require("../middlewares/validateMiddleware");

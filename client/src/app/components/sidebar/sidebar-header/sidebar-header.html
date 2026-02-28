@@ -3,30 +3,63 @@
     @if (user()?.avatar) {
       <img [src]="user()?.avatar" [alt]="user()?.username + ' Avatar'" class="profile-avatar" />
     } @else {
-      <div class="avatar-placeholder">{{ UsernameUpperedCase }}</div>
+      <div class="avatar-placeholder">
+        {{ usernameInitial }}
+      </div>
     }
+
     <div class="profile-info">
       <h3 class="profile-name">{{ user()?.username }}</h3>
-      <span class="profile-status" [ngClass]="{ online: authService.isAuthenticated() }">{{
-        authService.isAuthenticated() ? 'Online' : 'Offline'
-      }}</span>
+      <span class="profile-status" [ngClass]="{ online: authService.isAuthenticated() }">
+        {{ authService.isAuthenticated() ? 'Online' : 'Offline' }}
+      </span>
     </div>
   </div>
 
   <div class="header-actions">
-    <button class="icon-btn" title="New">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        <line x1="12" y1="9" x2="12" y2="15"></line>
-        <line x1="9" y1="12" x2="15" y2="12"></line>
-      </svg>
-    </button>
+    <button class="icon-btn" title="New Chat" (click)="onNewChat()">+</button>
   </div>
+
+  @if (showUserList()) {
+    <div #dropdownRef class="users-dropdown custom-scrollbar">
+      <div class="dropdown-header">
+        Start New Conversation
+        <span class="online-count"> ({{ onlineCount }} online) </span>
+      </div>
+
+      @if (isLoading()) {
+        @for (item of [1, 2, 3, 4]; track item) {
+          <div class="user-item skeleton">
+            <div class="mini-avatar skeleton-avatar"></div>
+            <div class="user-details">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line small"></div>
+            </div>
+          </div>
+        }
+      } @else {
+        @if (errorMessage()) {
+          <div class="error">{{ errorMessage() }}</div>
+        }
+
+        @for (u of availableUsers(); track u._id) {
+          <div class="user-item" (click)="startChat(u._id)">
+            <div class="avatar-wrapper">
+              <img [src]="u.avatar" class="mini-avatar" />
+              <span class="online-dot" [ngClass]="{ active: u.online }"></span>
+            </div>
+
+            <div class="user-details">
+              <span class="name">{{ u.username }}</span>
+              <span class="status">
+                {{ u.online ? 'Online' : 'Offline' }}
+              </span>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty">No users available</div>
+        }
+      }
+    </div>
+  }
 </div>
