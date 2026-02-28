@@ -24,33 +24,12 @@ export class MessageInput {
 
   messageText: string = '';
 
-  onKeyPress(event: KeyboardEvent) {
-    if (!this.selectedUserId()) {
-      return;
-    }
-
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      this.chatService
-        .sendTextMessage(this.chatId(), this.messageText)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (response) => {
-            this.messageText = '';
-
-            this.socketService.emit('user:new_message', {
-              toUserId: this.selectedUserId(),
-              fromUserId: this.fromUserId,
-              message: response.data.message,
-            });
-          },
-        });
-    }
+  canSend() {
+    return this.messageText !== '' && this.selectedUserId();
   }
 
-  onInput() {
-    if (!this.selectedUserId() || this.fromUserId === '') {
-      console.warn('No user selected, cannot emit typing status');
+  onKeyPress(event: KeyboardEvent) {
+    if (!this.selectedUserId()) {
       return;
     }
 
@@ -68,6 +47,28 @@ export class MessageInput {
         fromUserId: this.fromUserId,
         isTyping: false,
       });
-    }, 3000);
+    }, 1000);
+
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  sendMessage() {
+    this.chatService
+      .sendTextMessage(this.chatId(), this.messageText)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.messageText = '';
+
+          this.socketService.emit('user:new_message', {
+            toUserId: this.selectedUserId(),
+            fromUserId: this.fromUserId,
+            message: response.data.message,
+          });
+        },
+      });
   }
 }

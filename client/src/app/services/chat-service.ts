@@ -45,6 +45,8 @@ interface DeleteMessageResponse {
   message: string;
 }
 
+type markReadResponse = { status: string; data: { modifiedCount: number; message: string } };
+
 @Injectable({
   providedIn: 'root',
 })
@@ -190,6 +192,18 @@ export class ChatService {
     this.typingUsers.set(updated);
   }
 
+  markMessagesRead(chatId: string): Observable<markReadResponse> {
+    return this.httpClient
+      .post<markReadResponse>(`${this.BASE_URL}/${chatId}/messages/read`, null)
+      .pipe(
+        tap(() => {
+          this.chats.update((prevChats) =>
+            prevChats.map((chat) => (chat._id === chatId ? { ...chat, unreadCount: 0 } : chat)),
+          );
+        }),
+      );
+  }
+
   getOrCreateChat(userId: string): Observable<ChatResponse> {
     return this.httpClient.post<ChatResponse>(this.BASE_URL, { userId });
   }
@@ -214,7 +228,6 @@ export class ChatService {
     this.selectedChatId.set(chatId);
     return this.httpClient.get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`).pipe(
       tap((response) => {
-        console.log("Loaded messages in service: ", response.data.messages);
         this.messages.set(response.data.messages);
       }),
     );

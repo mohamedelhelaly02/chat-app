@@ -4,6 +4,7 @@ const {
   getOrCreateChat,
   getAllChats,
   getChatById,
+  markMessagesRead,
 } = require("../controllers/chat.controller");
 const {
   getAllMessages,
@@ -27,6 +28,8 @@ router
   .get(authMiddleware, getAllChats);
 
 router.get("/:chatId", authMiddleware, getChatById);
+
+router.post("/:chatId/messages/read", authMiddleware, markMessagesRead);
 
 router.get("/:chatId/messages", authMiddleware, getAllMessages);
 

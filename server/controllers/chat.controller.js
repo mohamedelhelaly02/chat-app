@@ -1,6 +1,7 @@
 const asyncHandler = require("../utils/asyncHandler");
 const { User } = require("../models/user.model");
 const { Chat } = require("../models/chat.model");
+const { Message } = require("../models/message.model");
 const appError = require("../utils/appError");
 const httpStatusText = require("../utils/httpStatusText");
 
@@ -75,4 +76,43 @@ const getChatById = asyncHandler(async (req, res, next) => {
     .json({ status: httpStatusText.SUCCESS, data: { chat: chatObj } });
 });
 
-module.exports = { getOrCreateChat, getAllChats, getChatById };
+const markMessagesRead = asyncHandler(async (req, res, next) => {
+  const { chatId } = req.params;
+  const userId = req.userId;
+  const existedChat = await Chat.findById(chatId);
+  if (!existedChat) {
+    return next(appError.create("chat not founded.", 404, httpStatusText.FAIL));
+  }
+
+  const result = await Message.updateMany(
+    {
+      chat: chatId,
+      receiver: userId,
+      read: false,
+    },
+    {
+      $set: {
+        read: true,
+        readAt: new Date(),
+      },
+    },
+  );
+
+  existedChat.unreadCount.set(userId, 0);
+  await existedChat.save();
+
+  return res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    data: {
+      modifiedCount: result.modifiedCount,
+      message: "Messages marked as read successfully",
+    },
+  });
+});
+
+module.exports = {
+  getOrCreateChat,
+  getAllChats,
+  getChatById,
+  markMessagesRead,
+};

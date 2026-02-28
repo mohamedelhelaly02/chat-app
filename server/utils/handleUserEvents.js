@@ -163,10 +163,22 @@ const handleUserEvents = (io, socket) => {
     });
   });
 
-  socket.on('user:changed_avatar', ({ userId }) => {
-    console.log( `User with id ${userId} changed his profile avatar`);
-    socket.broadcast.emit('user:load_user_chats');
-  })
+  socket.on("user:changed_avatar", ({ userId }) => {
+    console.log(`User with id ${userId} changed his profile avatar`);
+    socket.broadcast.emit("user:load_user_chats");
+  });
+
+  socket.on("user:read_messages", async ({ fromUserId, toUserId, chatId }) => {
+    const readMessages = await Message.find({
+      chat: chatId,
+      receiver: fromUserId,
+      read: true,
+    });
+
+    io.to(toUserId).emit("user:messages_marked_as_read", {
+      readIds: readMessages.map((m) => m._id.toString()),
+    });
+  });
 };
 
 module.exports = { handleUserEvents };

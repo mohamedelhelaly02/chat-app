@@ -54,30 +54,6 @@
     align-items: center;
 }
 
-.action-btn {
-    background: none;
-    border: none;
-    color: #667781;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-}
-
-.action-btn:hover:not(:disabled) {
-    background: rgba(37, 211, 102, 0.1);
-    color: #25d366;
-}
-
-.action-btn:disabled {
-    color: #ccc;
-    cursor: not-allowed;
-}
 
 .emoji-btn svg,
 .voice-btn svg,
@@ -88,8 +64,8 @@
 }
 
 .send-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: #25d366;
     border: none;
@@ -98,23 +74,41 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
     padding: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .send-btn:hover:not(:disabled) {
-    background: #20c757;
-    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+    background: #20ba5a;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
 }
 
 .send-btn:active:not(:disabled) {
-    transform: scale(0.95);
+    transform: scale(0.92);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .send-btn:disabled {
-    background: #ccc;
+    background: #e9edef;
+    color: #b1b3b5;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+.send-btn svg {
+    width: 20px;
+    height: 20px;
+    transform: rotate(0deg); 
+    transition: transform 0.3s ease;
+}
+
+.send-btn:not(:disabled) svg {
+    margin-left: 2px;
 }
 
 .voice-btn.recording {
