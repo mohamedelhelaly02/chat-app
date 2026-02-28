@@ -18,6 +18,7 @@ const httpStatusText = require("./utils/httpStatusText");
 const { verifyJwtToken } = require("./utils/jwt");
 const { User } = require("./models/user.model");
 
+
 const PORT = process.env.PORT || 4000;
 const app = express();
 const server = http.createServer(app);
@@ -29,19 +30,10 @@ const io = socketIo(server, {
   },
 });
 
-mongoose.set("bufferCommands", false);
-
-async function startApp() {
-  await mongoose.connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 5000,
-  });
-
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT} 🚀`);
-  });
-}
-
-startApp();
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error(`DB Connection error: ${err}`));
 
 app.use(morgan("dev"));
 app.use(cors({ origin: process.env.FRONT_END_URI, credentials: true }));
@@ -132,6 +124,6 @@ io.on("connection", async (socket) => {
   });
 });
 
-// server.listen(PORT, () => {
-//   console.log(`Server running on http://localhost:${PORT}`);
-// });
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

@@ -13,8 +13,8 @@ const { RefreshToken } = require("../models/refreshToken.model");
 
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: "Lax",
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "none",
 };
 
 const register = asyncHandler(async (req, res, next) => {
@@ -163,6 +163,5 @@ const refreshToken = asyncHandler(async (req, res, next) => {
     .cookie("refreshToken", newRefreshToken, cookieOptions)
     .json({ accessToken: newAccessToken });
 });
-
 
 module.exports = { register, login, logout, refreshToken };

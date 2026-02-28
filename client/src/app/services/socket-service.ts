@@ -7,7 +7,7 @@ import { io, Socket } from 'socket.io-client';
 })
 export class SocketService {
   private socket!: Socket;
-  private readonly socketUrl = 'https://chat-app-black-ten-76.vercel.app';
+  private readonly socketUrl = 'https://chat-app-api-production-a381.up.railway.app';
   isConnected: WritableSignal<boolean> = signal<boolean>(false);
   connectionError: WritableSignal<string | null> = signal<string | null>(null);
 
@@ -25,7 +25,6 @@ export class SocketService {
       }
 
       this.socket = io(this.socketUrl, {
-        transports: ['polling'],
         reconnection: true,
         autoConnect: true,
         reconnectionAttempts: 5,
