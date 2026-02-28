@@ -1,5 +1,13 @@
 import { SocketService } from '../../services/socket-service';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ChatService } from '../../services/chat-service';
 import { UserMessage } from '../user-message/user-message';
 import { MessageInput } from '../message-input/message-input';
@@ -20,6 +28,24 @@ export class ChatArea implements OnInit {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
   private readonly socketService: SocketService = inject(SocketService);
   protected readonly typingUsers = this.chatService.typingUsers;
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+
+  constructor() {
+    effect(() => {
+      // needs to marked as seen to server
+      const messages = this.selectedChatMessages();
+      this.scrollToBottom();
+    });
+  }
+
+  private scrollToBottom() {
+    setTimeout(() => {
+      if (this.messagesContainer) {
+        this.messagesContainer.nativeElement.scrollTop =
+          this.messagesContainer.nativeElement.scrollHeight;
+      }
+    }, 100);
+  }
 
   ngOnInit(): void {
     this.socketService

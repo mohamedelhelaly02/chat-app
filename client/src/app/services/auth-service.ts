@@ -49,6 +49,8 @@ export class AuthService {
   resetAuthState(): void {
     this.currentUser.set(null);
     this.token.set(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 
   register(registerData: RegisterData): Observable<any> {

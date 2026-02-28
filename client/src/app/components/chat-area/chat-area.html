@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <div class="messages-container">
+    <div class="messages-container" #messagesContainer>
       <div class="messages-list">
         @for (message of selectedChatMessages(); track message._id) {
           <app-user-message [message]="message"></app-user-message>

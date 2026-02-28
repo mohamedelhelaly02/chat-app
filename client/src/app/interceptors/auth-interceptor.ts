@@ -62,8 +62,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 function handleLogout(authService: any, chatService: any, socketService: any, router: any) {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
   authService.resetAuthState();
   chatService.resetChatState();
   socketService.disconnect();

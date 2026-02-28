@@ -1,6 +1,8 @@
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { AuthService } from './auth-service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +12,7 @@ export class SocketService {
   private readonly socketUrl = 'http://localhost:4000';
   isConnected: WritableSignal<boolean> = signal<boolean>(false);
   connectionError: WritableSignal<string | null> = signal<string | null>(null);
+  private readonly router = inject(Router);
 
   connect(accessToken: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -51,6 +54,9 @@ export class SocketService {
         this.isConnected.set(false);
         this.connectionError.set(error.message || 'Connection error');
         this.socket.disconnect();
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        this.router.navigate(['/login']);
         reject(error);
       });
     });
