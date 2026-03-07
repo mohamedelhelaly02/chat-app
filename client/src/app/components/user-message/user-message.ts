@@ -1,8 +1,10 @@
 import { Message } from './../../models/message.model';
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { DatePipe } from '@angular/common';
 import { ChatService } from '../../services/chat-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SocketService } from '../../services/socket-service';
 
 @Component({
   selector: 'app-user-message',
@@ -15,6 +17,8 @@ export class UserMessage implements OnInit {
   private readonly authService: AuthService = inject(AuthService);
   private readonly currentUserId = this.authService.currentUser()?._id;
   private readonly chatService = inject(ChatService);
+  private readonly socketService = inject(SocketService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private currentAudio: HTMLAudioElement | null = null;
   activeMessageId = signal<string | null>(null);
@@ -72,5 +76,23 @@ export class UserMessage implements OnInit {
 
   isPlaying(message: Message) {
     return this.activeMessageId() === message._id && !this.currentAudio?.paused;
+  }
+
+  onDeleteMessage() {
+    if (confirm('Are you sure to delete this message ?')) {
+      this.chatService
+        .deleteMessage(this.message()._id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (response) => {
+            console.log(response);
+            this.socketService.emit('user:message_deleted', {
+              messageId: response.data.messageId,
+              toUserId: this.message().receiver,
+              fromUserId: this.authService.currentUser()?._id,
+            });
+          },
+        });
+    }
   }
 }

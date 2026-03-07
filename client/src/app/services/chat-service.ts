@@ -42,7 +42,7 @@ interface MessageResponse {
 
 interface DeleteMessageResponse {
   status: string;
-  message: string;
+  data: { messageId: string };
 }
 
 type markReadResponse = { status: string; data: { modifiedCount: number; message: string } };
@@ -229,7 +229,7 @@ export class ChatService {
     this.selectedChatId.set(chatId);
     return this.httpClient.get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`).pipe(
       tap((response) => {
-        console.log("api: ", response.data.messages);
+        console.log('api: ', response.data.messages);
         this.messages.set(response.data.messages);
       }),
     );
@@ -275,17 +275,6 @@ export class ChatService {
 
   deleteMessage(messageId: string): Observable<DeleteMessageResponse> {
     return this.httpClient.delete<DeleteMessageResponse>(`${this.BASE_URL}/messages/${messageId}`);
-  }
-
-  private upsertChat(existing: Chat[], incoming: Chat): Chat[] {
-    const index = existing.findIndex((chat) => chat._id === incoming._id);
-    if (index === -1) {
-      return [incoming, ...existing];
-    }
-
-    const next = [...existing];
-    next[index] = incoming;
-    return next;
   }
 
   private updateUserOnlineStatus(userId: string, online: boolean) {

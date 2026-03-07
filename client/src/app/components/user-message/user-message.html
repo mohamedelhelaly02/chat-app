@@ -1,79 +1,76 @@
 @if (message()) {
   <div class="message-wrapper" [class.mine]="isMine()">
-    @if (message().messageType === 'text') {
-      <div class="message-bubble">
-        <div class="message-content">
-          {{ message().content }}
+    <div
+      class="message-bubble"
+      [class.voice-bubble]="message().messageType === 'voice'"
+      [class.deleted]="message().deleted"
+    >
+      @if (isMine() && !message().deleted) {
+        <button class="delete-trigger" (click)="onDeleteMessage()" title="Delete Message">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path
+              d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+            />
+          </svg>
+        </button>
+      }
+
+      @if (message().deleted) {
+        <div class="message-content deleted-text">
+          <i>🚫 This message was deleted</i>
         </div>
+      } @else {
+        @if (message().messageType === 'text') {
+          <div class="message-content">
+            {{ message().content }}
+          </div>
+        }
 
-        <div class="message-meta">
-          <span class="time">
-            {{ message().createdAt | date: 'shortTime' }}
-          </span>
-
-          @if (isMine()) {
-            <span class="status" [class.read]="message().read">
-              @if (message().read) {
-                <span class="double-check read-blue">✔✔</span>
-              } @else if (message().delivered) {
-                <span class="double-check">✔✔</span>
+        @if (message().messageType === 'voice') {
+          <div class="voice-container">
+            <button class="play-btn" (click)="toggleVoice(message())">
+              @if (isPlaying(message())) {
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
               } @else {
-                <span class="single-check">✔</span>
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
               }
-            </span>
-          }
-        </div>
-      </div>
-    }
-
-    @if (message().messageType === 'voice') {
-      <div class="message-bubble voice-bubble">
-        <div class="voice-container">
-          <button class="play-btn" (click)="toggleVoice(message())">
-            @if (isPlaying(message())) {
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-              </svg>
-            } @else {
-              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            }
-          </button>
-
-          <div class="voice-content">
-            <div class="waveform-progress">
-              <input
-                type="range"
-                class="voice-slider"
-                min="0"
-                max="100"
-                value="0"
-                [value]="activeMessageId() === message()._id ? audioProgress() : 0"
-              />
-            </div>
-
-            <div class="voice-info">
-              <span class="duration">{{ formatDuration(message().voiceDuration || 0) }}</span>
+            </button>
+            <div class="voice-content">
+              <div class="waveform-progress">
+                <input
+                  type="range"
+                  class="voice-slider"
+                  min="0"
+                  max="100"
+                  [value]="activeMessageId() === message()._id ? audioProgress() : 0"
+                />
+              </div>
+              <div class="voice-info">
+                <span class="duration">{{ formatDuration(message().voiceDuration || 0) }}</span>
+              </div>
             </div>
           </div>
-        </div>
+        }
+      }
 
-        <div class="message-meta">
-          <span class="time">{{ message().createdAt | date: 'shortTime' }}</span>
-          @if (isMine()) {
-            <span class="status" [class.read]="message().read">
-              @if (message().read) {
-                <span class="double-check read-blue">✔✔</span>
-              } @else if (message().delivered) {
-                <span class="double-check">✔✔</span>
-              } @else {
-                <span class="single-check">✔</span>
-              }
-            </span>
-          }
-        </div>
+      <div class="message-meta">
+        <span class="time">{{ message().createdAt | date: 'shortTime' }}</span>
+        @if (isMine() && !message().deleted) {
+          <span class="status" [class.read]="message().read">
+            @if (message().read) {
+              <span class="double-check read-blue">✔✔</span>
+            } @else if (message().delivered) {
+              <span class="double-check">✔✔</span>
+            } @else {
+              <span class="single-check">✔</span>
+            }
+          </span>
+        }
       </div>
-    }
+    </div>
   </div>
 }

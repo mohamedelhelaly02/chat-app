@@ -22,7 +22,7 @@ const getAllMessages = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const messages = await Message.find({ chat: chatId, deleted: false }).sort({
+  const messages = await Message.find({ chat: chatId }).sort({
     createdAt: 1,
   });
 
@@ -116,7 +116,7 @@ const deleteMessage = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
-    message: "Message deleted successfully",
+    data: { messageId: message._id },
   });
 });
 

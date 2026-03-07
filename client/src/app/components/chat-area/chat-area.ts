@@ -131,6 +131,15 @@ export class ChatArea implements OnInit {
       .subscribe((data: any) => {
         this.recordingIndicator.set(data.recording);
       });
+
+    this.socketService
+      .on('message_deleted')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.chatService.messages.update((allMessages) =>
+          allMessages.map((msg) => (msg._id === data.messageId ? { ...msg, deleted: true } : msg)),
+        );
+      });
   }
 
   selectedUserChat() {

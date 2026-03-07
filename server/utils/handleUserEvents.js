@@ -187,6 +187,11 @@ const handleUserEvents = (io, socket) => {
 
     io.to(toUserId).emit("user:recording", { userId: fromUserId, recording });
   });
+
+  socket.on("user:message_deleted", ({ messageId, toUserId, fromUserId }) => {
+    io.to(toUserId).emit("message_deleted", { messageId });
+    io.to(fromUserId).emit("message_deleted", { messageId });
+  });
 };
 
 module.exports = { handleUserEvents };
