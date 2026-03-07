@@ -1,7 +1,6 @@
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { AuthService } from './auth-service';
 import { Router } from '@angular/router';
 
 @Injectable({

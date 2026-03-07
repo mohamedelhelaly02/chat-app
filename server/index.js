@@ -13,11 +13,10 @@ const { chatRouter } = require("./routes/chat.routes");
 const { usersRouter } = require("./routes/user.routes");
 const { globalErrorHandler } = require("./middlewares/globalErrorHandler");
 const { handleUserEvents } = require("./utils/handleUserEvents");
+const { handleConnection } = require("./utils/handleConnection");
 const appError = require("./utils/appError");
 const httpStatusText = require("./utils/httpStatusText");
 const { verifyJwtToken } = require("./utils/jwt");
-const { User } = require("./models/user.model");
-
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -90,38 +89,8 @@ io.use((socket, next) => {
 });
 
 io.on("connection", async (socket) => {
-  console.log(`User connected: ${socket.user.id}`);
-
-  const userId = socket.user.id;
-
-  socket.join(userId);
-
-  const user = await User.findById(userId);
-
-  await User.findByIdAndUpdate(userId, { online: true });
-
-  socket.broadcast.emit("user:statusChanged", {
-    userId: userId,
-    online: true,
-    username: user.username,
-  });
-
+  handleConnection(io, socket);
   handleUserEvents(io, socket);
-
-  socket.on("disconnect", async () => {
-    console.log(`User disconnected: ${socket.id}`);
-
-    await User.findByIdAndUpdate(userId, {
-      online: false,
-      lastSeen: new Date(),
-    });
-
-    socket.broadcast.emit("user:statusChanged", {
-      userId: userId,
-      online: false,
-      username: user.username,
-    });
-  });
 });
 
 server.listen(PORT, () => {
