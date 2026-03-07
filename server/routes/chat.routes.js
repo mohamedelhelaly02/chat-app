@@ -10,6 +10,7 @@ const {
   getAllMessages,
   createTextMessage,
   deleteMessage,
+  sendVoiceMessage,
 } = require("../controllers/messages.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
 const {
@@ -27,6 +28,8 @@ router
   )
   .get(authMiddleware, getAllChats);
 
+const upload = require("../middlewares/multerConfig");
+
 router.get("/:chatId", authMiddleware, getChatById);
 
 router.post("/:chatId/messages/read", authMiddleware, markMessagesRead);
@@ -34,6 +37,13 @@ router.post("/:chatId/messages/read", authMiddleware, markMessagesRead);
 router.get("/:chatId/messages", authMiddleware, getAllMessages);
 
 router.post("/:chatId/messages", authMiddleware, createTextMessage);
+
+router.post(
+  "/messages/voice",
+  authMiddleware,
+  upload.single("voice"),
+  sendVoiceMessage,
+);
 
 router.delete("/messages/:messageId", authMiddleware, deleteMessage);
 

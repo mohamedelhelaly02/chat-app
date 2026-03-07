@@ -22,8 +22,9 @@ const getAllMessages = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const messages = await Message.find({ chat: chatId, deleted: false })
-    .sort({ createdAt: 1 });
+  const messages = await Message.find({ chat: chatId, deleted: false }).sort({
+    createdAt: 1,
+  });
 
   return res
     .status(200)
@@ -119,4 +120,58 @@ const deleteMessage = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports = { getAllMessages, createTextMessage, deleteMessage };
+const sendVoiceMessage = asyncHandler(async (req, res, next) => {
+  if (!req.file) {
+    return next(
+      appError.create("Audio file is required", 400, httpStatusText.FAIL),
+    );
+  }
+
+  const { receiverId, duration } = req.body;
+
+  if (!receiverId) {
+    return next(
+      appError.create("Receiver user is required", 400, httpStatusText.FAIL),
+    );
+  }
+
+  const chat = await Chat.getOrCreateChat(req.userId, receiverId);
+
+  const voiceUrl = `/uploads/voice/${req.file.filename}`;
+
+  const receiver = await User.findById(receiverId);
+
+  const voiceMessage = new Message({
+    sender: req.userId,
+    receiver: receiverId,
+    chat: chat._id,
+    messageType: "voice",
+    voiceUrl,
+    voiceDuration: parseInt(duration) || 0,
+    delivered: !!receiver?.online,
+    deliveredAt: receiver?.online ? new Date() : null,
+    read: false,
+  });
+
+  await voiceMessage.save();
+
+  chat.lastMessage = voiceMessage._id;
+  chat.updatedAt = new Date();
+
+  const currentUnread = chat.unreadCount.get(receiverId.toString()) || 0;
+  chat.unreadCount.set(receiverId.toString(), currentUnread + 1);
+
+  await chat.save();
+
+  return res.status(201).json({
+    status: httpStatusText.SUCCESS,
+    data: { voiceMessage },
+  });
+});
+
+module.exports = {
+  getAllMessages,
+  createTextMessage,
+  deleteMessage,
+  sendVoiceMessage,
+};
