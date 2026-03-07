@@ -83,7 +83,7 @@ const createTextMessage = asyncHandler(async (req, res, next) => {
       messageId: message._id,
     });
 
-    req.io.to(receiverId.toString()).emit("user:new_message", message);
+    // req.io.to(receiverId.toString()).emit("user:new_message", message);
   }
 
   return res.status(201).json({
@@ -163,9 +163,18 @@ const sendVoiceMessage = asyncHandler(async (req, res, next) => {
 
   await chat.save();
 
+  if (receiver?.online) {
+    req.io.to(req.userId).emit("user:message_delivered", {
+      chatId: chat._id,
+      messageId: voiceMessage._id,
+    });
+
+    req.io.to(receiverId).emit("user:new_message", { message: voiceMessage });
+  }
+
   return res.status(201).json({
     status: httpStatusText.SUCCESS,
-    data: { voiceMessage },
+    data: { message: voiceMessage },
   });
 });
 

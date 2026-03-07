@@ -1,407 +1,179 @@
 :host {
-    display: block;
+  display: block;
 }
 
 .message-input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px 16px;
-    background: #fff;
-    border-top: 1px solid #e5e5ea;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f2f5;
 }
 
 .message-input {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f0f0f0;
-    border-radius: 20px;
-    padding: 8px 16px;
-    transition: all 0.2s ease;
-}
-
-.message-input:focus-within {
-    background: #e8e8e8;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 4px 12px;
+  min-height: 44px;
+  transition: background 0.3s ease;
 }
 
 .message-input input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 10px 0;
-    font-size: 14px;
-    color: #000;
-    font-family: inherit;
-    outline: none;
-    resize: none;
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 4px;
+  font-size: 15px;
+  color: #111b21;
+  outline: none;
 }
 
 .message-input input::placeholder {
-    color: #999;
-}
-
-.message-input input:disabled {
-    color: #ccc;
-    cursor: not-allowed;
+  color: #8696a0;
 }
 
 .input-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
-
-.emoji-btn svg,
-.voice-btn svg,
-.attach-btn svg,
-.send-btn svg {
-    width: 20px;
-    height: 20px;
+.action-btn {
+  background: transparent;
+  border: none;
+  color: #54656f;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
 }
 
-.send-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #25d366;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0;
-    padding: 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+/* --- Recording Bar --- */
+
+.recording-bar-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 4px 0;
 }
 
-.send-btn:hover:not(:disabled) {
-    background: #20ba5a;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transform: translateY(-1px);
+.send-btn-mini {
+  background: #00a884;
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
-.send-btn:active:not(:disabled) {
-    transform: scale(0.92);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+.send-btn-mini svg {
+  transform: scaleX(-1);
 }
 
-.send-btn:disabled {
-    background: #e9edef;
-    color: #b1b3b5;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: scale(0.9);
-    opacity: 0.8;
+.view-once-icon {
+  display: flex;
+  align-items: center;
+  color: #54656f;
+  opacity: 0.9;
 }
 
-.send-btn svg {
-    width: 20px;
-    height: 20px;
-    transform: rotate(0deg); 
-    transition: transform 0.3s ease;
+.pause-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
 }
 
-.send-btn:not(:disabled) svg {
-    margin-left: 2px;
-}
-
-.voice-btn.recording {
-    background: rgba(211, 47, 47, 0.1);
-    color: #d32f2f;
-}
-
-/* Spinner for sending state */
-.spinner-small {
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid #fff;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Character counter */
-.char-counter {
-    font-size: 12px;
-    color: #999;
-    text-align: right;
-    padding: 0 4px;
-}
-
-.char-counter.warning {
-    color: #ff9800;
-    font-weight: 500;
-}
-
-/* Recording Modal */
-.recording-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-.recording-content {
-    background: #fff;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 300px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.recording-animation {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.pulse-ring {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 3px solid #d32f2f;
-    border-radius: 50%;
-    animation: pulse 1.5s ease-out infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1.3);
-        opacity: 0;
-    }
-}
-
-.recording-animation svg {
-    position: relative;
-    z-index: 2;
-}
-
-.recording-time {
-    font-size: 24px;
-    font-weight: 700;
-    color: #d32f2f;
-    margin-bottom: 12px;
-}
-
-.recording-label {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 16px;
+.pause-bars {
+  width: 3px;
+  height: 16px;
+  background: #e53935;
+  box-shadow: 6px 0 0 #e53935;
+  border-radius: 2px;
+  margin-right: 8px;
 }
 
 .recording-waveform {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 4px;
-    margin: 20px 0;
-    height: 40px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 25px;
 }
 
 .wave-bar {
-    width: 4px;
-    background: #25d366;
-    border-radius: 2px;
-    animation: wave 0.6s ease-in-out infinite;
+  width: 2px;
+  background: #00a884;
+  border-radius: 1px;
+  transition: height 0.1s ease;
 }
 
-.wave-bar:nth-child(1) {
-    animation-delay: 0s;
+.timer-text {
+  color: #111b21;
+  font-size: 15px;
+  font-weight: 400;
+  min-width: 40px;
 }
 
-.wave-bar:nth-child(2) {
-    animation-delay: 0.1s;
+.red-indicator {
+  width: 8px;
+  height: 8px;
+  background: #e53935;
+  border-radius: 50%;
+  animation: blink 1s infinite;
 }
 
-.wave-bar:nth-child(3) {
-    animation-delay: 0.2s;
+.delete-btn {
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #54656f;
+  padding: 4px;
+  display: flex;
+  align-items: center;
 }
 
-.wave-bar:nth-child(4) {
-    animation-delay: 0.3s;
+.delete-btn svg {
+  fill: #54656f;
 }
 
-.wave-bar:nth-child(5) {
-    animation-delay: 0.4s;
+.delete-btn:hover {
+  color: #e53935;
 }
 
-@keyframes wave {
-
-    0%,
-    100% {
-        height: 6px;
-    }
-
-    50% {
-        height: 25px;
-    }
+.delete-btn:hover svg {
+  fill: #e53935;
 }
 
-.recording-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
-.cancel-btn,
-.send-record-btn {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-.cancel-btn {
-    background: #f0f0f0;
-    color: #666;
-}
-
-.cancel-btn:hover {
-    background: #e0e0e0;
-}
-
-.send-record-btn {
-    background: #25d366;
-    color: #fff;
-}
-
-.send-record-btn:hover {
-    background: #20c757;
-    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
-}
-
-/* Emoji Picker */
-.emoji-picker {
-    position: absolute;
-    bottom: 100%;
-    left: 16px;
-    background: #fff;
-    border: 1px solid #e5e5ea;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.emoji-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
+@media (max-width: 480px) {
+  .message-input {
     gap: 8px;
-}
-
-.emoji-item {
-    background: none;
-    border: none;
-    font-size: 20px;
-    padding: 4px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.emoji-item:hover {
-    background: #f0f0f0;
-    transform: scale(1.2);
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-    .message-input-container {
-        padding: 8px 12px;
-        gap: 6px;
-    }
-
-    .message-input {
-        padding: 6px 12px;
-    }
-
-    .message-input input {
-        padding: 8px 0;
-        font-size: 13px;
-    }
-
-    .action-btn {
-        width: 28px;
-        height: 28px;
-        padding: 4px;
-    }
-
-    .send-btn {
-        width: 32px;
-        height: 32px;
-    }
-
-    .recording-content {
-        max-width: 280px;
-        padding: 24px;
-    }
+  }
+  .timer-text {
+    font-size: 13px;
+  }
+  .recording-bar-content {
+    gap: 8px;
+  }
 }

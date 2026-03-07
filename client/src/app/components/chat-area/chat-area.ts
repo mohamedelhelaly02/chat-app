@@ -6,6 +6,7 @@ import {
   ElementRef,
   inject,
   OnInit,
+  signal,
   untracked,
   ViewChild,
 } from '@angular/core';
@@ -32,6 +33,7 @@ export class ChatArea implements OnInit {
   private readonly socketService: SocketService = inject(SocketService);
   protected readonly typingUsers = this.chatService.typingUsers;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+  recordingIndicator = signal<boolean>(false);
 
   constructor() {
     effect(() => {
@@ -75,7 +77,6 @@ export class ChatArea implements OnInit {
               toUserId: partnerId,
               chatId,
             });
-
           },
         });
     }
@@ -115,6 +116,20 @@ export class ChatArea implements OnInit {
             return message;
           });
         });
+      });
+
+    this.socketService
+      .on('user:new_message')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.chatService.messages.update((allMessages) => [...allMessages, data.message]);
+      });
+
+    this.socketService
+      .on('user:recording')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.recordingIndicator.set(data.recording);
       });
   }
 

@@ -64,6 +64,7 @@ export class ChatService {
   messagesError: WritableSignal<string | null> = signal<string | null>(null);
   selectedChatId: WritableSignal<string> = signal<string>('');
   typingUsers: WritableSignal<Set<string>> = signal<Set<string>>(new Set());
+  isRecording: WritableSignal<boolean> = signal<boolean>(false);
 
   resetChatState(): void {
     this.chats.set([]);
@@ -228,6 +229,7 @@ export class ChatService {
     this.selectedChatId.set(chatId);
     return this.httpClient.get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`).pipe(
       tap((response) => {
+        console.log("api: ", response.data.messages);
         this.messages.set(response.data.messages);
       }),
     );
@@ -256,6 +258,19 @@ export class ChatService {
           this.messages.update((prev) => [...prev, response.data.message]);
         }),
       );
+  }
+
+  sendVoiceMessage(receiverId: string, duration: number, audio: Blob): Observable<MessageResponse> {
+    const formData = new FormData();
+    formData.append('voice', audio, 'voice.webm');
+    formData.append('receiverId', receiverId);
+    formData.append('duration', duration.toString());
+
+    return this.httpClient.post<MessageResponse>(`${this.BASE_URL}/messages/voice`, formData).pipe(
+      tap((response) => {
+        this.messages.update((prev) => [...prev, response.data.message]);
+      }),
+    );
   }
 
   deleteMessage(messageId: string): Observable<DeleteMessageResponse> {

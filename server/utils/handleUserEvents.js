@@ -179,6 +179,14 @@ const handleUserEvents = (io, socket) => {
       readIds: readMessages.map((m) => m._id.toString()),
     });
   });
+
+  socket.on("user:recording", ({ toUserId, fromUserId, recording }) => {
+    console.log(
+      `User ${fromUserId} is ${recording ? "recording" : "not recording"} to ${toUserId} `,
+    );
+
+    io.to(toUserId).emit("user:recording", { userId: fromUserId, recording });
+  });
 };
 
 module.exports = { handleUserEvents };
