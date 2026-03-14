@@ -31,10 +31,17 @@ const handleUserEvents = (io, socket) => {
           { $set: { delivered: true, deliveredAt: new Date() } },
         );
 
-        undeliveredMessages.forEach((msg) => {
-          io.to(msg.sender.toString()).emit("user:message_delivered", {
-            chatId: msg.chat.toString(),
-            messageId: msg._id.toString(),
+        const senders = [
+          ...new Set(undeliveredMessages.map((m) => m.sender.toString())),
+        ];
+
+        // todo
+        senders.forEach((senderId) => {
+          io.to(senderId).emit("user:message_delivered", {
+            receiverId: userId,
+            messageIds: undeliveredMessages
+              .filter((m) => m.sender.toString() === senderId)
+              .map((m) => m._id),
           });
         });
 

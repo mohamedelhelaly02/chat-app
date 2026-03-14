@@ -169,10 +169,9 @@ export class ChatService {
       .on('user:message_delivered')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
-        if (this.selectedChatId() !== data.chatId) return;
         this.messages.update((allMessages) =>
           allMessages.map((message) =>
-            message._id === data.messageId ? { ...message, delivered: true } : message,
+            data.messageIds.includes(message._id) ? { ...message, delivered: true } : message,
           ),
         );
       });

@@ -1,21 +1,18 @@
 const { User } = require("../models/user.model");
 const { Message } = require("../models/message.model");
+const { addUser, removeUser } = require("../utils/presence");
 
 const handleConnection = async (io, socket) => {
-  console.log(`User connected: ${socket.user.id}`);
+  console.log(`User connected: ${socket.id}`);
 
   const userId = socket.user.id;
 
+  addUser(userId, socket.id);
   socket.join(userId);
-
-  const user = await User.findById(userId);
-
-  await User.findByIdAndUpdate(userId, { online: true });
 
   socket.broadcast.emit("user:statusChanged", {
     userId: userId,
     online: true,
-    username: user.username,
   });
 
   try {
@@ -32,10 +29,18 @@ const handleConnection = async (io, socket) => {
         { $set: { delivered: true, deliveredAt: new Date() } },
       );
 
-      undeliveredMessages.forEach((msg) => {
-        io.to(msg.sender.toString()).emit("user:message_delivered", {
-          chatId: msg.chat.toString(),
-          messageId: msg._id.toString(),
+      const senders = [
+        ...new Set(undeliveredMessages.map((m) => m.sender.toString())),
+      ];
+
+
+      // todo
+      senders.forEach((senderId) => {
+        io.to(senderId).emit("user:message_delivered", {
+          receiverId: userId,
+          messageIds: undeliveredMessages
+            .filter((m) => m.sender.toString() === senderId)
+            .map((m) => m._id),
         });
       });
 
@@ -47,19 +52,20 @@ const handleConnection = async (io, socket) => {
     console.error("Error processing offline messages:", error);
   }
 
-  socket.on("disconnect", async () => {
+  socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
 
-    await User.findByIdAndUpdate(userId, {
-      online: false,
-      lastSeen: new Date(),
-    });
-
-    socket.broadcast.emit("user:statusChanged", {
-      userId: userId,
-      online: false,
-      username: user.username,
-    });
+    setTimeout(async () => {
+      const activeSockets = await io.in(userId).fetchSockets();
+      if (activeSockets.length === 0) {
+        removeUser(userId);
+        await User.findByIdAndUpdate(userId, { lastSeen: new Date() });
+        socket.broadcast.emit("user:statusChanged", {
+          userId: userId,
+          online: false,
+        });
+      }
+    }, 3000);
   });
 };
 

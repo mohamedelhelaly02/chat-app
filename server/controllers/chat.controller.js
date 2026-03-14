@@ -4,6 +4,7 @@ const { Chat } = require("../models/chat.model");
 const { Message } = require("../models/message.model");
 const appError = require("../utils/appError");
 const httpStatusText = require("../utils/httpStatusText");
+const { isOnline } = require("../utils/presence");
 
 const getOrCreateChat = asyncHandler(async (req, res, next) => {
   const { userId } = req.body;
@@ -25,7 +26,7 @@ const getAllChats = asyncHandler(async (req, res, next) => {
   const chats = await Chat.find({
     participants: req.userId,
   })
-    .populate("participants", "username email avatar online lastSeen")
+    .populate("participants", "username email avatar lastSeen")
     .populate({
       path: "lastMessage",
       populate: {
@@ -34,26 +35,33 @@ const getAllChats = asyncHandler(async (req, res, next) => {
       },
     });
 
-  const chatsWithUnread = chats.map((chat) => {
+  const chatsWithDetails = chats.map((chat) => {
     const chatObj = chat.toObject();
 
     chatObj.participants = chatObj.participants.filter(
       (p) => p._id.toString() !== req.userId.toString(),
     );
 
+    chatObj.participants = chatObj.participants.map((p) => ({
+      ...p,
+      online: isOnline(p._id.toString()),
+    }));
+
     chatObj.unreadCount = chat.unreadCount.get(req.userId.toString()) || 0;
+
     return chatObj;
   });
 
-  return res
-    .status(200)
-    .json({ status: httpStatusText.SUCCESS, data: { chats: chatsWithUnread } });
+  return res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    data: { chats: chatsWithDetails },
+  });
 });
 
 const getChatById = asyncHandler(async (req, res, next) => {
   const { chatId } = req.params;
   const chat = await Chat.findById(chatId)
-    .populate("participants", "_id username email avatar online lastSeen")
+    .populate("participants", "_id username email avatar lastSeen")
     .populate({
       path: "lastMessage",
       populate: {
@@ -67,9 +75,13 @@ const getChatById = asyncHandler(async (req, res, next) => {
   }
 
   const chatObj = chat.toObject();
-  chatObj.participants = chatObj.participants.filter(
-    (p) => p._id.toString() !== req.userId.toString(),
-  );
+
+  chatObj.participants = chatObj.participants
+    .filter((p) => p._id.toString() !== req.userId.toString())
+    .map((p) => ({
+      ...p,
+      online: isOnline(p._id.toString()),
+    }));
 
   return res
     .status(200)

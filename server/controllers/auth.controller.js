@@ -57,7 +57,6 @@ const login = asyncHandler(async (req, res, next) => {
     );
   }
 
-  user.online = true;
   user.lastSeen = new Date();
 
   await user.save();
@@ -99,7 +98,6 @@ const logout = asyncHandler(async (req, res, next) => {
   }
 
   await User.findByIdAndUpdate(req.userId, {
-    online: false,
     lastSeen: new Date(),
   });
 

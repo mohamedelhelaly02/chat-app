@@ -3,7 +3,7 @@ const { Message } = require("../models/message.model");
 const { Chat } = require("../models/chat.model");
 const appError = require("../utils/appError");
 const httpStatusText = require("../utils/httpStatusText");
-const { User } = require("../models/user.model");
+const { isOnline } = require("../utils/presence");
 
 const getAllMessages = asyncHandler(async (req, res, next) => {
   const { chatId } = req.params;
@@ -56,7 +56,8 @@ const createTextMessage = asyncHandler(async (req, res, next) => {
   const receiverId = chat.participants.find(
     (p) => p.toString() !== senderId.toString(),
   );
-  const receiver = await User.findById(receiverId);
+
+  const receiverIsOnline = isOnline(receiverId);
 
   const message = new Message({
     sender: senderId,
@@ -64,8 +65,8 @@ const createTextMessage = asyncHandler(async (req, res, next) => {
     chat: chatId,
     messageType: "text",
     content: content.trim(),
-    delivered: !!receiver?.online,
-    deliveredAt: receiver?.online ? new Date() : null,
+    delivered: receiverIsOnline,
+    deliveredAt: receiverIsOnline ? new Date() : null,
   });
 
   await message.save();
@@ -77,7 +78,7 @@ const createTextMessage = asyncHandler(async (req, res, next) => {
   }
   await chat.save();
 
-  if (receiver?.online) {
+  if (receiverIsOnline) {
     req.io.to(senderId.toString()).emit("user:message_delivered", {
       chatId: chatId,
       messageId: message._id,
@@ -139,7 +140,7 @@ const sendVoiceMessage = asyncHandler(async (req, res, next) => {
 
   const voiceUrl = `/uploads/voice/${req.file.filename}`;
 
-  const receiver = await User.findById(receiverId);
+  const receiverIsOnline = isOnline(receiverId);
 
   const voiceMessage = new Message({
     sender: req.userId,
@@ -148,8 +149,8 @@ const sendVoiceMessage = asyncHandler(async (req, res, next) => {
     messageType: "voice",
     voiceUrl,
     voiceDuration: parseInt(duration) || 0,
-    delivered: !!receiver?.online,
-    deliveredAt: receiver?.online ? new Date() : null,
+    delivered: receiverIsOnline,
+    deliveredAt: receiverIsOnline ? new Date() : null,
     read: false,
   });
 
@@ -163,7 +164,7 @@ const sendVoiceMessage = asyncHandler(async (req, res, next) => {
 
   await chat.save();
 
-  if (receiver?.online) {
+  if (receiverIsOnline) {
     req.io.to(req.userId).emit("user:message_delivered", {
       chatId: chat._id,
       messageId: voiceMessage._id,
