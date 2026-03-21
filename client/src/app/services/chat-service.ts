@@ -164,6 +164,18 @@ export class ChatService {
       });
   }
 
+  listenToChatUpdatedAfterDeleteMessageEvent(): void {
+    this.socketService
+      .on('user:chat_updated_after_delete')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        const { chatId, lastMessage } = data;
+        this.chats.update((allChats) => {
+          return allChats.map((chat) => (chat._id === chatId ? { ...chat, lastMessage } : chat));
+        });
+      });
+  }
+
   listenToDeliveredMessageEvent(): void {
     this.socketService
       .on('user:message_delivered')

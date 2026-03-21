@@ -114,6 +114,32 @@ const deleteMessage = asyncHandler(async (req, res, next) => {
   message.deletedAt = new Date();
   await message.save();
 
+  const lastMessage = await Message.findOne({
+    chat: message.chat,
+    deleted: { $ne: true },
+  }).sort({ createdAt: -1 });
+
+  const updatedChat = await Chat.findByIdAndUpdate(
+    message.chat,
+    {
+      lastMessage: lastMessage?._id || null,
+      updatedAt: Date.now(),
+    },
+    { new: true },
+  );
+
+  req.io
+    .to(message.receiver.toString())
+    .emit("user:chat_updated_after_delete", {
+      chatId: updatedChat._id,
+      lastMessage,
+    });
+
+  req.io.to(req.userId).emit("user:chat_updated_after_delete", {
+    chatId: updatedChat._id,
+    lastMessage,
+  });
+
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
     data: { messageId: message._id },

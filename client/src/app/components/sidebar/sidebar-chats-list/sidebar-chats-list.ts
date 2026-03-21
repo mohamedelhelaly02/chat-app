@@ -34,6 +34,7 @@ export class SidebarChatsList implements OnInit {
     this.chatService.listenToUserStatusChangedEvent();
     this.chatService.listenToUserTypingEvent();
     this.chatService.listenToChatUpdatedEvent();
+    this.chatService.listenToChatUpdatedAfterDeleteMessageEvent();
     this.chatService.listenToUserLoadChatsEvent();
   }
 
