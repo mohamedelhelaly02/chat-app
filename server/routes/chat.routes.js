@@ -11,6 +11,8 @@ const {
   createTextMessage,
   deleteMessage,
   sendVoiceMessage,
+  reactToMessage,
+  getMessageReactions,
 } = require("../controllers/messages.controller");
 const authMiddleware = require("../middlewares/authMiddleware");
 const {
@@ -37,6 +39,16 @@ router.post("/:chatId/messages/read", authMiddleware, markMessagesRead);
 router.get("/:chatId/messages", authMiddleware, getAllMessages);
 
 router.post("/:chatId/messages", authMiddleware, createTextMessage);
+router.post(
+  "/:chatId/messages/:messageId/reactions",
+  authMiddleware,
+  reactToMessage,
+);
+router.get(
+  "/:chatId/messages/:messageId/reactions",
+  authMiddleware,
+  getMessageReactions,
+);
 
 router.post(
   "/messages/voice",

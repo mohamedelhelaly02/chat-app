@@ -4,6 +4,7 @@ const { Chat } = require("../models/chat.model");
 const appError = require("../utils/appError");
 const httpStatusText = require("../utils/httpStatusText");
 const { User } = require("../models/user.model");
+const { allowedEmojis } = require("../utils/constants");
 
 const getAllMessages = asyncHandler(async (req, res, next) => {
   const { chatId } = req.params;
@@ -204,9 +205,124 @@ const sendVoiceMessage = asyncHandler(async (req, res, next) => {
   });
 });
 
+const reactToMessage = asyncHandler(async (req, res, next) => {
+  const { chatId, messageId } = req.params;
+
+  const { emoji } = req.body;
+
+  const existedChat = await Chat.findById(chatId);
+
+  if (!existedChat) {
+    return next(
+      appError.create(
+        "Start conversation to react to message",
+        404,
+        httpStatusText.FAIL,
+      ),
+    );
+  }
+
+  const isParticipant = existedChat.participants.some(
+    (p) => p.toString() === req.userId,
+  );
+
+  if (!isParticipant) {
+    return next(
+      appError.create(
+        "can not to react to message",
+        403,
+        httpStatusText.FORBIDDEN,
+      ),
+    );
+  }
+
+  let existedMessage = await Message.findById(messageId).where({
+    deleted: false,
+  });
+
+  if (!existedMessage) {
+    return next(appError.create("Message not found", 404, httpStatusText.FAIL));
+  }
+
+  if (!emoji || !allowedEmojis.includes(emoji)) {
+    return next(
+      appError.create("Not allowed emoji", 400, httpStatusText.ERROR),
+    );
+  }
+
+  const reactionResponse = await existedMessage.addReaction(req.userId, emoji);
+
+  return res.status(200).json({
+    status: "success",
+    data: reactionResponse,
+  });
+});
+
+const getMessageReactions = asyncHandler(async (req, res, next) => {
+  const { chatId, messageId } = req.params;
+
+  const existedChat = await Chat.findById(chatId);
+
+  if (!existedChat) {
+    return next(appError.create("Chat not found", 404, httpStatusText.FAIL));
+  }
+
+  const isParticipant = existedChat.participants.some(
+    (p) => p.toString() === req.userId,
+  );
+
+  if (!isParticipant) {
+    return next(
+      appError.create(
+        "You are not authorized to view reactions in this chat",
+        403,
+        httpStatusText.FORBIDDEN,
+      ),
+    );
+  }
+
+  const message = await Message.findOne({
+    _id: messageId,
+    chat: chatId,
+    deleted: false,
+  })
+    .populate({
+      path: "reactions",
+      select: "-__v",
+      populate: {
+        path: "reactedBy",
+        select: "username avatar",
+      },
+    })
+    .select("-__v");
+
+  if (!message) {
+    return next(
+      appError.create("Message not found or deleted", 404, httpStatusText.FAIL),
+    );
+  }
+
+  const reactionsSummary = message.reactions.reduce((acc, reaction) => {
+    const emoji = reaction.emoji;
+    acc[emoji] = (acc[emoji] || 0) + 1;
+    return acc;
+  }, {});
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      totalReactions: message.reactions.length,
+      summary: reactionsSummary,
+      allReactions: message.reactions,
+    },
+  });
+});
+
 module.exports = {
   getAllMessages,
   createTextMessage,
   deleteMessage,
   sendVoiceMessage,
+  reactToMessage,
+  getMessageReactions,
 };
