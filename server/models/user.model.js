@@ -23,8 +23,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default:
-        "https://ui-avatars.com/api/?name=User&background=0084ff&color=fff",
+      default: "http://localhost:4000/uploads/default_profile.png",
     },
     bio: {
       type: String,
@@ -38,7 +37,7 @@ const userSchema = new mongoose.Schema(
     lastSeen: {
       type: Date,
       default: Date.now,
-    }
+    },
   },
   { timestamps: true },
 );
