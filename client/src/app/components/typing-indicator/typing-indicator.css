@@ -1,42 +1,32 @@
-
-.typing-indicator {
-    margin: 4px 0 0 0;
-    font-size: 12px;
-    color: #2196f3;
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    height: 16px;
+.typing-indicator-text {
+  font-size: 14px;
+  color: #ffffff;
+  padding: 8px 12px;
+  background: #25d366;
+  border-radius: 18px;
+  width: fit-content;
+  font-weight: 500;
 }
 
-.typing-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: #2196f3;
-    display: inline-block;
-    animation: typingAnimation 1.4s infinite;
+.dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
 }
 
-.typing-dot:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.typing-dot:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes typingAnimation {
-
-    0%,
-    60%,
-    100% {
-        opacity: 0.5;
-        transform: translateY(0);
-    }
-
-    30% {
-        opacity: 1;
-        transform: translateY(-8px);
-    }
+@keyframes dots {
+  0% {
+    content: '';
+  }
+  25% {
+    content: '.';
+  }
+  50% {
+    content: '..';
+  }
+  75% {
+    content: '...';
+  }
+  100% {
+    content: '';
+  }
 }
