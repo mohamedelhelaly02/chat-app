@@ -1,0 +1,11 @@
+<div class="user-navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <app-navbar-logo></app-navbar-logo>
+    </div>
+
+    <div class="navbar-right">
+      <app-navbar-user-menu [user]="authService.currentUser()"></app-navbar-user-menu>
+    </div>
+  </div>
+</div>

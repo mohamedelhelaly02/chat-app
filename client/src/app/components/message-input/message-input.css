@@ -1,0 +1,179 @@
+:host {
+  display: block;
+}
+
+.message-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f2f5;
+}
+
+.message-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 4px 12px;
+  min-height: 44px;
+  transition: background 0.3s ease;
+}
+
+.message-input input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 4px;
+  font-size: 15px;
+  color: #111b21;
+  outline: none;
+}
+
+.message-input input::placeholder {
+  color: #8696a0;
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  color: #54656f;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- Recording Bar --- */
+
+.recording-bar-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.send-btn-mini {
+  background: #00a884;
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.send-btn-mini svg {
+  transform: scaleX(-1);
+}
+
+.view-once-icon {
+  display: flex;
+  align-items: center;
+  color: #54656f;
+  opacity: 0.9;
+}
+
+.pause-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+}
+
+.pause-bars {
+  width: 3px;
+  height: 16px;
+  background: #e53935;
+  box-shadow: 6px 0 0 #e53935;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+.recording-waveform {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 25px;
+}
+
+.wave-bar {
+  width: 2px;
+  background: #00a884;
+  border-radius: 1px;
+  transition: height 0.1s ease;
+}
+
+.timer-text {
+  color: #111b21;
+  font-size: 15px;
+  font-weight: 400;
+  min-width: 40px;
+}
+
+.red-indicator {
+  width: 8px;
+  height: 8px;
+  background: #e53935;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+.delete-btn {
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: #54656f;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.delete-btn svg {
+  fill: #54656f;
+}
+
+.delete-btn:hover {
+  color: #e53935;
+}
+
+.delete-btn:hover svg {
+  fill: #e53935;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-input {
+    gap: 8px;
+  }
+  .timer-text {
+    font-size: 13px;
+  }
+  .recording-bar-content {
+    gap: 8px;
+  }
+}

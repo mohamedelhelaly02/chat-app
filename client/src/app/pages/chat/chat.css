@@ -1,0 +1,61 @@
+.chats-page {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #efeae2;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.no-chat-selected {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #efeae2 0%, #f5f1eb 100%);
+    text-align: center;
+    padding: 40px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+.no-chat-selected h1 {
+    font-size: 32px;
+    font-weight: 300;
+    color: #41525d;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.no-chat-selected p {
+    font-size: 14px;
+    color: #667781;
+    max-width: 480px;
+    line-height: 1.5;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .chats-page {
+        flex-direction: column;
+    }
+
+    .chat-area {
+        height: 100%;
+    }
+
+    .no-chat-selected {
+        padding: 20px;
+    }
+
+    .no-chat-selected h1 {
+        font-size: 24px;
+    }
+}

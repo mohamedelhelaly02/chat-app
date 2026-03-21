@@ -1,0 +1,80 @@
+<div class="chat-area">
+  @if (!selectedChatMessages()) {
+    <div class="empty-state">
+      <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+      </svg>
+      <h2>مرحباً بك! 👋</h2>
+      <p>اختر محادثة من القائمة للبدء</p>
+    </div>
+  } @else if (isLoadingMessages()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>جاري تحميل الرسائل...</p>
+    </div>
+  } @else if (messagesError()) {
+    <div class="error-state">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+        />
+      </svg>
+      <p class="error">حدث خطأ في تحميل الرسائل</p>
+      <p>{{ messagesError() }}</p>
+    </div>
+  } @else {
+    <div class="chat-header">
+      @if (selectedUserChat()?.avatar) {
+        <img [src]="selectedUserChat()?.avatar" alt="Avatar" />
+      } @else {
+        <div class="avatar-placeholder">{{ UsernameUpperedCase }}</div>
+      }
+      <div>
+        <h3>{{ selectedUserChat()?.username }}</h3>
+        <span class="status">
+          {{ selectedUserChat()?.online ? 'Online now ' : 'Offline' }}
+        </span>
+      </div>
+
+      <button class="exit-btn" (click)="exitChat()">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="messages-container" #messagesContainer>
+      <div class="messages-list">
+        @for (message of selectedChatMessages(); track message._id) {
+          <app-user-message [message]="message"></app-user-message>
+        }
+
+        @if (typingUsers().has(selectedUserId())) {
+          <app-typing-indicator></app-typing-indicator>
+        }
+
+        @if (recordingIndicator()) {
+          <div class="recording-indicator">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#e53935">
+              <path
+                d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"
+              />
+              <path
+                d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"
+              />
+            </svg>
+          </div>
+        }
+      </div>
+    </div>
+
+    <app-message-input [selectedUserId]="selectedUserId()"> </app-message-input>
+  }
+</div>

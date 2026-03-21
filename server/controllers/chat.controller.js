@@ -1,0 +1,118 @@
+const asyncHandler = require("../utils/asyncHandler");
+const { User } = require("../models/user.model");
+const { Chat } = require("../models/chat.model");
+const { Message } = require("../models/message.model");
+const appError = require("../utils/appError");
+const httpStatusText = require("../utils/httpStatusText");
+
+const getOrCreateChat = asyncHandler(async (req, res, next) => {
+  const { userId } = req.body;
+  const chatWithUser = await User.findById(userId);
+
+  if (!chatWithUser) {
+    return next(
+      appError.create("Chat participant not found", 400, httpStatusText.FAIL),
+    );
+  }
+
+  const chat = await Chat.getOrCreateChat(req.userId, userId);
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { chat } });
+});
+
+const getAllChats = asyncHandler(async (req, res, next) => {
+  const chats = await Chat.find({
+    participants: req.userId,
+  })
+    .populate("participants", "username email avatar online lastSeen")
+    .populate({
+      path: "lastMessage",
+      populate: {
+        path: "sender",
+        select: "username avatar",
+      },
+    });
+
+  const chatsWithUnread = chats.map((chat) => {
+    const chatObj = chat.toObject();
+
+    chatObj.participants = chatObj.participants.filter(
+      (p) => p._id.toString() !== req.userId.toString(),
+    );
+
+    chatObj.unreadCount = chat.unreadCount.get(req.userId.toString()) || 0;
+    return chatObj;
+  });
+
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { chats: chatsWithUnread } });
+});
+
+const getChatById = asyncHandler(async (req, res, next) => {
+  const { chatId } = req.params;
+  const chat = await Chat.findById(chatId)
+    .populate("participants", "_id username email avatar online lastSeen")
+    .populate({
+      path: "lastMessage",
+      populate: {
+        path: "sender",
+        select: "username avatar",
+      },
+    });
+
+  if (!chat) {
+    return next(appError.create("Chat not found", 404, httpStatusText.FAIL));
+  }
+
+  const chatObj = chat.toObject();
+  chatObj.participants = chatObj.participants.filter(
+    (p) => p._id.toString() !== req.userId.toString(),
+  );
+
+  return res
+    .status(200)
+    .json({ status: httpStatusText.SUCCESS, data: { chat: chatObj } });
+});
+
+const markMessagesRead = asyncHandler(async (req, res, next) => {
+  const { chatId } = req.params;
+  const userId = req.userId;
+  const existedChat = await Chat.findById(chatId);
+  if (!existedChat) {
+    return next(appError.create("chat not founded.", 404, httpStatusText.FAIL));
+  }
+
+  const result = await Message.updateMany(
+    {
+      chat: chatId,
+      receiver: userId,
+      read: false,
+    },
+    {
+      $set: {
+        read: true,
+        readAt: new Date(),
+      },
+    },
+  );
+
+  existedChat.unreadCount.set(userId, 0);
+  await existedChat.save();
+
+  return res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    data: {
+      modifiedCount: result.modifiedCount,
+      message: "Messages marked as read successfully",
+    },
+  });
+});
+
+module.exports = {
+  getOrCreateChat,
+  getAllChats,
+  getChatById,
+  markMessagesRead,
+};

@@ -1,0 +1,65 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #25d366;
+  --primary-dark: #128c7e;
+  --primary-light: #dcf8c6;
+  --secondary-color: #34b7f1;
+
+  --bg-color: #f0f2f5;
+  --chat-bg: #e5ddd5;
+  --sidebar-bg: #ffffff;
+
+  --sent-message-bg: #d9fdd3;
+  --received-message-bg: #ffffff;
+
+  --text-primary: #111111;
+  --text-secondary: #667781;
+  --text-muted: #8696a0;
+
+  --border-color: #d1d7db;
+  --hover-bg: #f5f6f6;
+  --active-bg: #f0f2f5;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 5px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  --wa-green: #25d366;
+  --wa-green-dark: #128c7e;
+  --wa-teal: #075e54;
+  --wa-light-green: #dcf8c6;
+  --wa-bubble-in: #ffffff;
+  --wa-bubble-out: #dcf8c6;
+  --wa-bg: #efeae2;
+  --wa-text: #111b21;
+  --wa-meta: #667781;
+  --wa-blue-tick: #53bdeb;
+  --wa-deleted-bg: #f0f2f5;
+  --wa-deleted-text: #8696a0;
+  --wa-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  direction: rtl;
+}
+
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
