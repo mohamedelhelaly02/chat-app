@@ -1,3 +1,5 @@
+import { Reaction } from "./reaction.model";
+
 export interface Message {
   _id: string;
   sender: string;
@@ -15,4 +17,5 @@ export interface Message {
   deletedAt?: string;
   createdAt: string;
   updatedAt: string;
+  reactions: Reaction[]
 }

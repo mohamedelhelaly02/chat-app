@@ -1,14 +1,15 @@
 import { Message } from './../../models/message.model';
-import { Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, input, OnInit, signal } from '@angular/core';
 import { AuthService } from '../../services/auth-service';
 import { DatePipe } from '@angular/common';
 import { ChatService } from '../../services/chat-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SocketService } from '../../services/socket-service';
+import { MessageReactions } from '../message-reactions/message-reactions';
 
 @Component({
   selector: 'app-user-message',
-  imports: [DatePipe],
+  imports: [DatePipe, MessageReactions],
   templateUrl: './user-message.html',
   styleUrl: './user-message.css',
 })
@@ -23,10 +24,12 @@ export class UserMessage implements OnInit {
   private currentAudio: HTMLAudioElement | null = null;
   activeMessageId = signal<string | null>(null);
   audioProgress = signal<number>(0);
+  protected isHovered = signal<boolean>(false);
 
   ngOnInit(): void {
     this.chatService.listenToReadEvents();
     this.chatService.listenToDeliveredMessageEvent();
+    this.chatService.listenToMessageReactionsEvent();
   }
 
   isMine() {
@@ -94,5 +97,18 @@ export class UserMessage implements OnInit {
           },
         });
     }
+  }
+
+  @HostListener('mouseenter')
+  onMouseEnter() {
+    console.log('Hovered');
+    this.isHovered.set(true);
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeaved() {
+    console.log('Leaved');
+
+    this.isHovered.set(false);
   }
 }

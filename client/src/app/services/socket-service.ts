@@ -37,19 +37,16 @@ export class SocketService {
       });
 
       this.socket.on('connect', () => {
-        console.log('Socket connected:', this.socket.id);
         this.isConnected.set(true);
         this.connectionError.set(null);
         resolve();
       });
 
       this.socket.on('disconnect', (reason) => {
-        console.log('Socket disconnected, reason:', reason);
         this.isConnected.set(false);
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('Connection error:', error);
         this.isConnected.set(false);
         this.connectionError.set(error.message || 'Connection error');
         this.socket.disconnect();
@@ -67,7 +64,6 @@ export class SocketService {
       this.socket.disconnect();
       this.isConnected.set(false);
 
-      console.log('socket is disconnected successfully');
     }
   }
 

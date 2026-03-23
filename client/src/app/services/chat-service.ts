@@ -1,10 +1,22 @@
 import { HttpClient } from '@angular/common/http';
-import { DestroyRef, inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Chat } from '../models/chat.model';
 import { Message } from '../models/message.model';
 import { SocketService } from './socket-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Reaction } from '../models/reaction.model';
+
+export interface ReactionsResponse {
+  status: string;
+  data: ReactionResponseData;
+}
+
+export interface ReactionResponseData {
+  totalReactions: number;
+  summary: {};
+  allReactions: Reaction[];
+}
 
 interface ChatDataResponse {
   chat: Chat;
@@ -94,6 +106,20 @@ export class ChatService {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
         this.loadChats();
+      });
+  }
+
+  listenToMessageReactionsEvent(): void {
+    this.socketService
+      .on('messageReactionUpdated')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        const { message } = data;
+        this.messages.update((oldMessages) =>
+          oldMessages.map((msg) => {
+            return msg._id === message._id ? { ...msg, reactions: message.reactions } : msg;
+          }),
+        );
       });
   }
 
@@ -241,7 +267,6 @@ export class ChatService {
     this.selectedChatId.set(chatId);
     return this.httpClient.get<MessagesResponse>(`${this.BASE_URL}/${chatId}/messages`).pipe(
       tap((response) => {
-        console.log('api: ', response.data.messages);
         this.messages.set(response.data.messages);
       }),
     );
@@ -317,5 +342,28 @@ export class ChatService {
         return { ...chat, participants: updatedUsers };
       });
     });
+  }
+
+  addReaction(chatId: string, messageId: string, emoji: string) {
+    return this.httpClient
+      .post(`${this.BASE_URL}/${chatId}/messages/${messageId}/reactions`, {
+        emoji,
+      })
+      .pipe(
+        tap((response: any) => {
+          console.log('Reaction response: ', response);
+          this.messages.update((oldMsgs) =>
+            oldMsgs.map((msg) =>
+              msg._id === messageId ? { ...msg, reactions: response.data.reactions } : msg,
+            ),
+          );
+        }),
+      );
+  }
+
+  getMessageReactions(chatId: string, messageId: string): Observable<ReactionsResponse> {
+    return this.httpClient.get<ReactionsResponse>(
+      `${this.BASE_URL}/${chatId}/messages/${messageId}/reactions`,
+    );
   }
 }

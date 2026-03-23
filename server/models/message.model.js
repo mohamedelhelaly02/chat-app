@@ -74,26 +74,29 @@ messageSchema.methods.addReaction = async function (userId, emoji) {
       await Reaction.findByIdAndDelete(existingReaction._id);
       this.reactions.pull(existingReaction._id);
       await this.save();
-      return { status: "removed" };
     } else {
       existingReaction.emoji = emoji;
       await existingReaction.save();
-      return { status: "updated", reaction: existingReaction };
     }
+  } else {
+    const newReaction = await Reaction.create({
+      reactedBy: userId,
+      message: messageId,
+      emoji: emoji,
+    });
+    this.reactions.push(newReaction._id);
+    await this.save();
   }
 
-  const newReaction = await Reaction.create({
-    reactedBy: userId,
-    message: messageId,
-    emoji: emoji,
+  return await this.constructor.findById(messageId).populate({
+    path: "reactions",
+    select: "-__v",
+    populate: {
+      path: "reactedBy",
+      select: "username avatar",
+    },
   });
-
-  this.reactions.push(newReaction._id);
-  await this.save();
-
-  return { status: "added", reaction: newReaction };
 };
-
 const Message = mongoose.model("Message", messageSchema);
 
 module.exports = { Message };

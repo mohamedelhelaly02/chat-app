@@ -71,6 +71,14 @@
           </span>
         }
       </div>
+
+      @if (!message().deleted) {
+        <app-message-reactions
+          [messageId]="message()._id"
+          [chatId]="message().chat"
+          [isHovered]="isHovered()"
+        ></app-message-reactions>
+      }
     </div>
   </div>
 }

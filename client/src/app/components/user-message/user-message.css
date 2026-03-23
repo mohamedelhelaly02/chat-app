@@ -1,7 +1,7 @@
 /* Wrapper */
 .message-wrapper {
   display: flex;
-  margin: 2px 16px;
+  margin: 2px 40px;
   padding: 1px 0;
   position: relative;
 }

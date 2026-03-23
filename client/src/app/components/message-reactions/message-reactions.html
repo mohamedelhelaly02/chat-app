@@ -1,0 +1,92 @@
+<div class="reactions-container">
+  @if (isHovered()) {
+    <button class="add-reaction-btn" (click)="togglePicker()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path
+          d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8 s8,3.59,8,8S16.41,20,12,20z M15.5,11c0.83,0,1.5-0.67,1.5-1.5S16.33,8,15.5,8S14,8.67,14,9.5S14.67,11,15.5,11z M8.5,11 c0.83,0,1.5-0.67,1.5-1.5S9.33,8,8.5,8S7,8.67,7,9.5S7.67,11,8.5,11z M12,17.5c2.03,0,3.8-1.11,4.75-2.75 c0.19-0.33,0.1-0.75-0.21-0.97c-0.31-0.21-0.72-0.12-0.94,0.18c-0.69,0.96-1.81,1.54-3.6,1.54s-2.91-0.58-3.6-1.54 c-0.22-0.3-0.63-0.39-0.94-0.18c-0.31,0.21-0.4,0.63-0.21,0.97C8.2,16.39,9.97,17.5,12,17.5z"
+        ></path>
+      </svg>
+    </button>
+  }
+
+  @if (hasReactions()) {
+    <div class="reactions-summary" (click)="openReactionDetails(message())">
+      @for (reaction of message()?.reactions?.slice(0, 3); track reaction.emoji) {
+        <span class="reaction-item">
+          <span class="emoji">{{ reaction.emoji }}</span>
+        </span>
+      }
+    </div>
+  }
+
+  @if (showPicker()) {
+    <div class="reaction-picker">
+      <div class="picker-header">
+        <span>اختر تفاعلاً</span>
+        <button class="close-btn" (click)="closePicker()">×</button>
+      </div>
+      <div class="emoji-grid">
+        @for (emoji of availableEmojis(); track emoji) {
+          <button class="emoji-btn" (click)="selectReaction(emoji)">
+            {{ emoji }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (showDetails()) {
+    <div class="reaction-details-overlay" (click)="closeDetails()">
+      <div class="reaction-details-content" (click)="$event.stopPropagation()">
+        <div class="details-header">
+          <span>تفاعلات الرسالة</span>
+          <button (click)="closeDetails()" class="close-btn">×</button>
+        </div>
+
+        <div class="details-tabs">
+          <button
+            class="tab-btn"
+            [class.active]="selectedEmoji() === 'All'"
+            (click)="selectTab('All')"
+          >
+            الكل {{ reactionDetails()?.totalReactions }}
+          </button>
+
+          @for (tab of reactionTabs(); track tab.emoji) {
+            <button
+              class="tab-btn"
+              [class.active]="selectedEmoji() === tab.emoji"
+              (click)="selectTab(tab.emoji)"
+            >
+              <span class="tab-emoji">{{ tab.emoji }}</span>
+              <span class="tab-count">{{ tab.count }}</span>
+            </button>
+          }
+        </div>
+
+        <div class="details-body">
+          @if (isLoadingReactions()) {
+            <div class="loader-container">
+              <div class="spinner"></div>
+              <span>جاري التحميل...</span>
+            </div>
+          } @else {
+            @for (react of filteredReactions(); track react._id) {
+              <div class="user-reaction-row">
+                <div class="avatar-wrapper">
+                  <img [src]="react.reactedBy.avatar" class="user-avatar" />
+                  <span class="mini-emoji">{{ react.emoji }}</span>
+                </div>
+                <div class="user-info">
+                  <span class="user-name">{{ react.reactedBy.username }}</span>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-state">لا توجد تفاعلات بعد.</div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

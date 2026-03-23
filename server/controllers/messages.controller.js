@@ -23,9 +23,16 @@ const getAllMessages = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const messages = await Message.find({ chat: chatId }).sort({
-    createdAt: 1,
-  });
+  const messages = await Message.find({ chat: chatId })
+    .populate({
+      path: "reactions",
+      select: "-__v",
+      populate: {
+        path: "reactedBy",
+        select: "username avatar",
+      },
+    })
+    .sort({ createdAt: 1 });
 
   return res
     .status(200)
@@ -250,11 +257,24 @@ const reactToMessage = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const reactionResponse = await existedMessage.addReaction(req.userId, emoji);
+  const updatedMessage = await existedMessage.addReaction(req.userId, emoji);
+
+  // req.io.to(req.userId).emit("messageReactionUpdated", {
+  //   messageId: messageId,
+  //   response,
+  // });
+
+  req.io
+    .to(updatedMessage.sender.toString())
+    .emit("messageReactionUpdated", { message: updatedMessage });
+
+  req.io
+    .to(updatedMessage.receiver.toString())
+    .emit("messageReactionUpdated", { message: updatedMessage });
 
   return res.status(200).json({
     status: "success",
-    data: reactionResponse,
+    data: updatedMessage,
   });
 });
 
